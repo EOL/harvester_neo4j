@@ -14,27 +14,6 @@ public class Node implements Serializable{
     String acceptedNodeId;
     int acceptedNodeGeneratedId;
 
-//    public Node(String nodeId, int resourceId, String scientificName, int generatedNodeId, String rank, int parentGeneratedNodeId,
-//                String parentNodeId, String acceptedNodeId, int acceptedNodeGeneratedId) {
-//        this.nodeId = nodeId;
-//        this.resourceId = resourceId;
-//        this.scientificName = scientificName;
-//        this.generatedNodeId = generatedNodeId;
-//        this.rank = rank;
-//        this.parentGeneratedNodeId = parentGeneratedNodeId;
-//        this.parentNodeId = parentNodeId;
-//        this.acceptedNodeId = acceptedNodeId;
-//        this.acceptedNodeGeneratedId = acceptedNodeGeneratedId;
-//    }
-//
-//    public Node(int resourceId, String nodeId, String scientificName, String rank, int parentGeneratedNodeId) {
-//        this.nodeId = nodeId;
-//        this.resourceId = resourceId;
-//        this.scientificName = scientificName;
-//        this.rank = rank;
-//        this.parentGeneratedNodeId = parentGeneratedNodeId;
-//    }
-
     public String getNodeId() {
         return nodeId;
     }

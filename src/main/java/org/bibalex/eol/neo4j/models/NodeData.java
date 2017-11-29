@@ -2,7 +2,7 @@ package org.bibalex.eol.neo4j.models;
 
 import java.util.ArrayList;
 
-public class NodesData
+public class NodeData
 {
     ArrayList<String> ancestors = new ArrayList<>();
     ArrayList<String> children = new ArrayList<>();
