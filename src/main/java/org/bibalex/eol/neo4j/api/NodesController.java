@@ -1,6 +1,6 @@
 package org.bibalex.eol.neo4j.api;
 
-import org.bibalex.eol.neo4j.models.NodesData;
+import org.bibalex.eol.neo4j.models.NodeData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,29 +15,44 @@ public class NodesController {
     @Autowired
     private NodesService service;
 
-    @RequestMapping(value="/createSynRelation/{id}", method = RequestMethod.POST)
-    public ResponseEntity<String> uploadResource(@PathVariable("id") String id, @RequestParam("nodeId") String nodeId)  {
-        System.out.println(nodeId);
-//        service.createSynRelation(Integer.parseInt(id), Integer.parseInt(nodeId));
-        return new ResponseEntity("Successfully added - " + id, new HttpHeaders(), HttpStatus.OK);
 
-    }
 
-//    @RequestMapping(value="/createNode/", method = RequestMethod.POST)
-//    public int createNode(@RequestParam("resourceId") String resourceId, @RequestParam("taxonId") String taxonId,
-//                                          @RequestParam("scientificName") String scientificName, @RequestParam("rank") String rank,
-//                                          @RequestParam("parentGeneratedNodeId") String parentGeneratedNodeId)
-//    {
-//       int nodeId =  service.createNode(Integer.parseInt(resourceId),taxonId,scientificName,rank,Integer.parseInt(parentGeneratedNodeId));
-//       System.out.print(new ResponseEntity("Successfully added - " , new HttpHeaders(), HttpStatus.OK));
-//       return nodeId;
-//    }
     @RequestMapping(value="/createNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
      public int createNode(@RequestBody Node n)
     {
         int  generatedNodeId = service.createNode(n);
         return generatedNodeId;
     }
+
+    @RequestMapping(value="/createSynonymNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+     public int createSynonym(@RequestBody Node n)
+    {
+        int  generatedNodeId = service.createSynonym(n);
+        return generatedNodeId;
+    }
+
+     @RequestMapping(value="/createSynonymRelation/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+     public boolean createSynonymRelation(@RequestBody Node n)
+    {
+        boolean  created = service.createRelationBetweenNodeAndSynonyms(n);
+        return created;
+    }
+
+     @RequestMapping(value="/createAncestorNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+     public int createAncestorNode(@RequestBody Node n)
+    {
+        int  generatedNodeId = service.createAncestorNode(n);
+        return generatedNodeId;
+    }
+
+
+    @RequestMapping(value="/createParentWithPlaceholder/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+     public int createParentNode(@RequestBody Node n)
+    {
+        int  generatedNodeId = service.createParentNode(n);
+        return generatedNodeId;
+    }
+
 
     @RequestMapping(value="/getNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public int getNode(@RequestBody Node n)
@@ -46,10 +61,25 @@ public class NodesController {
        return generatedNodeId;
     }
 
-    @RequestMapping(value="/getNodeData/{generatedNodeId}", method = RequestMethod.POST)
-    public NodesData getNodeData(@PathVariable("generatedNodeId") String generatedNodeId)
+    @RequestMapping(value="/getAcceptedNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public int getAcceptedNode(@RequestBody Node n)
     {
-        NodesData data = service.getData(generatedNodeId);
+       int generatedNodeId =  service.getAcceptedNode(n);
+       return generatedNodeId;
+    }
+
+
+    @RequestMapping(value="/getSynonymNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public int getSynonymNode(@RequestBody Node n)
+    {
+       int generatedNodeId =  service.getSynonymNode(n);
+       return generatedNodeId;
+    }
+
+    @RequestMapping(value="/getNodeData/{generatedNodeId}", method = RequestMethod.GET)
+    public NodeData getNodeData(@PathVariable("generatedNodeId") String generatedNodeId)
+    {
+        NodeData data = service.getData(generatedNodeId);
         return data;
     }
 
