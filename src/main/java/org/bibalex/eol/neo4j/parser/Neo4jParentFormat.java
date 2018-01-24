@@ -11,7 +11,8 @@ public class Neo4jParentFormat extends Neo4jCommon  {
     {
         autoId = getAutoId();
         String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {parentUsageId}," +
-                " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}})" +
+                " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
+                " created_at: apoc.date.currentTimestamp(),updated_at: apoc.date.currentTimestamp()})" +
                 "RETURN n.generated_auto_id";
         StatementResult result = getSession().run(create_query, parameters( "resourceId", resourceId,
                 "parentUsageId", parentUsageId, "scientificName", "placeholder", "rank", "placeholder", "autoId", autoId ));

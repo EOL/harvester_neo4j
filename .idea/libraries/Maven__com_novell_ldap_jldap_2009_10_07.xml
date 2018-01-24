@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.novell.ldap:jldap:2009-10-07">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/novell/ldap/jldap/2009-10-07/jldap-2009-10-07.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/novell/ldap/jldap/2009-10-07/jldap-2009-10-07-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/novell/ldap/jldap/2009-10-07/jldap-2009-10-07-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

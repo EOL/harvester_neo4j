@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
-public class Neo4jAncestoryFormat extends Neo4jCommon {
+public class Neo4jAncestryFormat extends Neo4jCommon {
 
     public int createAncestorIfNotExist(int resourceId, String scientificName, String rank, String nodeId,
                                         int parentGeneratedNodeId)
@@ -19,8 +19,8 @@ public class Neo4jAncestoryFormat extends Neo4jCommon {
         {
             logger.debug("Node "+ scientificName +" not found creating a new node");
             String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {nodeId}," +
-                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}})" +
-                    "RETURN n.generated_auto_id";
+                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, created_at: apoc.date.currentTimestamp(), " +
+                    "updated_at: apoc.date.currentTimestamp()})RETURN n.generated_auto_id";
             StatementResult result = getSession().run(create_query, parameters( "resourceId", resourceId,
                     "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId ));
             if (parentGeneratedNodeId != 0) {

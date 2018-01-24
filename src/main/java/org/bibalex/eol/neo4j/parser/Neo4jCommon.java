@@ -39,7 +39,7 @@ public class Neo4jCommon {
 
     public Session getSession (){
         if (session == null || !session.isOpen()) {
-            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4j"));
+            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "eol"));
             session = driver.session();
 
         }
@@ -112,8 +112,8 @@ public class Neo4jCommon {
     {
         autoId = getAutoId();
         String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {nodeId}," +
-                " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}})" +
-                "RETURN n.generated_auto_id";
+                " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, created_at: apoc.date.currentTimestamp()," +
+                "updated_at: apoc.date.currentTimestamp()}) RETURN n.generated_auto_id";
         StatementResult result = getSession().run(create_query, parameters( "resourceId", resourceId,
                 "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId ));
         if (parentGeneratedNodeId != 0) {
@@ -147,8 +147,8 @@ public class Neo4jCommon {
     {
         autoId = getAutoId();
         String create_query = "CREATE (s:Synonym {resource_id: {resourceId}, node_id: {nodeId}," +
-                "scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}})" +
-                " RETURN s.generated_auto_id";
+                "scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
+                " created_at: apoc.date.currentTimestamp(), updated_at: apoc.date.currentTimestamp()}) RETURN s.generated_auto_id";
         StatementResult result = getSession().run(create_query, parameters( "resourceId", resourceId,
                 "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId ) );
         Record record = result.next();
