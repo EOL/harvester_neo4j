@@ -1,5 +1,7 @@
 package org.bibalex.eol.neo4j.api;
 
+//import org.bibalex.eol.neo4j.backend_api.Neo4jForest;
+import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.bibalex.eol.neo4j.parser.Neo4jAncestryFormat;
@@ -18,6 +20,8 @@ public class NodesService {
     Neo4jAncestryFormat aNode = new Neo4jAncestryFormat();
     HbaseData hbaseData = new HbaseData();
     NodeData nodeData = new NodeData();
+    Neo4jTree forest = new Neo4jTree();
+
 
     public int createNode(Node n)
     {
@@ -85,6 +89,12 @@ public class NodesService {
        ArrayList<String> synonyms = hbaseData.getSynonyms(Integer.parseInt(generatedNodeId));
        nodeData.setData(ancestors,children,synonyms);
        return nodeData;
+    }
+
+    public ArrayList<Neo4jTree> getUpdates(String timestamp)
+    {
+         ArrayList<Neo4jTree> trees=forest.getTrees(timestamp);
+         return trees;
     }
 
 }

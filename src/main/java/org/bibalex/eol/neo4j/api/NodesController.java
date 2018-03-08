@@ -1,5 +1,7 @@
 package org.bibalex.eol.neo4j.api;
 
+//import org.bibalex.eol.neo4j.backend_api.Neo4jForest;
+import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -7,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.bibalex.eol.neo4j.models.Node;
+
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/neo4j")
@@ -81,6 +85,13 @@ public class NodesController {
     {
         NodeData data = service.getData(generatedNodeId);
         return data;
+    }
+
+    @RequestMapping(value="/getNeo4jUpdates/", method = RequestMethod.POST, consumes = "text/plain")
+    public ArrayList<Neo4jTree> getChangesfromTimestamp(@RequestBody String timestamp )
+    {
+        ArrayList<Neo4jTree> trees = service.getUpdates(timestamp);
+        return trees;
     }
 
 }

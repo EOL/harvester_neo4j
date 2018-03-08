@@ -7,7 +7,6 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 @SpringBootApplication
 public class Neo4jSpringAPI extends SpringBootServletInitializer {
-//    public class Neo4jSpringAPI {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
