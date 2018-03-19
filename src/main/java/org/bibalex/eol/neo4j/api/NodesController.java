@@ -3,6 +3,7 @@ package org.bibalex.eol.neo4j.api;
 //import org.bibalex.eol.neo4j.backend_api.Neo4jForest;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.NodeData;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.bibalex.eol.neo4j.models.Node;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @RestController
@@ -92,6 +94,13 @@ public class NodesController {
     {
         ArrayList<Neo4jTree> trees = service.getUpdates(timestamp);
         return trees;
+    }
+
+
+    @RequestMapping(value="/getNodesJson", method = RequestMethod.POST , consumes = "application/json", produces = "application/json")
+    public ArrayList<JSONObject> getNodesJson(@RequestBody int[] generatedNodeIds) throws IOException {
+        ArrayList<JSONObject> nodes = service.getJson(generatedNodeIds);
+        return nodes;
     }
 
 }
