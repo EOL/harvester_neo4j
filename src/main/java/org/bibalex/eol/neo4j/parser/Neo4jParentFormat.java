@@ -19,13 +19,13 @@ public class Neo4jParentFormat extends Neo4jCommon  {
         autoId ++;
         if (result.hasNext())
         {
-            logger.debug("Node with id " + parentUsageId + " created with placeholders");
+//            logger.debug("Node with id " + parentUsageId + " created with placeholders");
             Record record = result.next();
             return record.get("n.generated_auto_id").asInt();
         }
         else
         {
-            logger.debug("Node with id  "+ parentUsageId + " is not created a problem has occured");
+//            logger.debug("Node with id  "+ parentUsageId + " is not created a problem has occured");
             return -1;
         }
 

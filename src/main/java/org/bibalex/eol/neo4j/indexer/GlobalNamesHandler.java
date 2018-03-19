@@ -1,4 +1,4 @@
-package org.bibalex.eol.neo4j.handlers;
+package org.bibalex.eol.neo4j.indexer;
 
 import org.globalnames.parser.ScientificNameParser;
 import org.json.simple.JSONObject;
@@ -6,12 +6,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 public class GlobalNamesHandler {
 
     private JSONParser parser;
     private Object att;
-
+    java.util.logging.Logger logger =  Logger.getLogger("globalNamesHandler");
     public GlobalNamesHandler(){
         parser = new JSONParser();
     }
@@ -20,7 +21,6 @@ public class GlobalNamesHandler {
         String jsonStr = ScientificNameParser.instance()
                 .fromString(name)
                 .renderCompactJson();
-//       System.out.println("jsonstring"+jsonStr);
         try {
             return (JSONObject)parser.parse(jsonStr);
         } catch (ParseException e) {
@@ -37,17 +37,19 @@ public class GlobalNamesHandler {
     private String parseAndGetResultString(String name, String attribute) {
         JSONObject attr = (JSONObject) getParsedJson(name).get(attribute);
         Object att = attr.get("value");
-            return att == null ? null : att.toString();
+        return att == null ? null : att.toString();
 
     }
 
 
     public boolean isHybrid(String name){
+        logger.info("Getting isHyprid of node with scientific name" +name );
         return parseAndGetResult(name, "hybrid");
     }
 
 
     public String getCanonicalName(String name )  {
+        logger.info("Getting canonical node with scientific name" +name );
         return parseAndGetResultString(name, "canonical_name");
     }
 }

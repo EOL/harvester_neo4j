@@ -1,18 +1,22 @@
 package org.bibalex.eol.neo4j.api;
 
 import org.bibalex.eol.neo4j.hbase.HbaseData;
+import org.bibalex.eol.neo4j.indexer.Neo4jIndexer;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.bibalex.eol.neo4j.parser.Neo4jAncestryFormat;
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
 import org.bibalex.eol.neo4j.models.Node;
 import org.bibalex.eol.neo4j.parser.Neo4jParentFormat;
+import org.json.simple.JSONObject;
 import org.neo4j.driver.v1.Session;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Service
 public class NodesService {
+    Neo4jIndexer indexer = new Neo4jIndexer();
     Neo4jCommon parser = new Neo4jCommon();
     Neo4jParentFormat pNode = new Neo4jParentFormat();
     Neo4jAncestryFormat aNode = new Neo4jAncestryFormat();
@@ -21,34 +25,34 @@ public class NodesService {
 
     public int createNode(Node n)
     {
-       int generatedNodeId =  parser.createAcceptedNode(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
-                     n.getParentGeneratedNodeId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  parser.createAcceptedNode(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
+                n.getParentGeneratedNodeId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
-     public int createSynonym(Node n)
+    public int createSynonym(Node n)
     {
-       int generatedNodeId =  parser.createSynonymNode(n.getResourceId(), n.getNodeId(), n.getScientificName(),
-               n.getRank(), n.getAcceptedNodeId(), n.getAcceptedNodeGeneratedId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  parser.createSynonymNode(n.getResourceId(), n.getNodeId(), n.getScientificName(),
+                n.getRank(), n.getAcceptedNodeId(), n.getAcceptedNodeGeneratedId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
 
     public int createParentNode(Node n)
     {
-       int generatedNodeId =  pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
     public int createAncestorNode(Node n)
     {
-       int generatedNodeId =  aNode.createAncestorIfNotExist(n.getResourceId(), n.getScientificName(),
-               n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  aNode.createAncestorIfNotExist(n.getResourceId(), n.getScientificName(),
+                n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
     public boolean createRelationBetweenNodeAndSynonyms(Node n)
@@ -80,11 +84,17 @@ public class NodesService {
 
     public NodeData getData(String generatedNodeId)
     {
-       ArrayList<String> ancestors = hbaseData.getAncestors(Integer.parseInt(generatedNodeId));
-       ArrayList<String> children = hbaseData.getChildren(Integer.parseInt(generatedNodeId));
-       ArrayList<String> synonyms = hbaseData.getSynonyms(Integer.parseInt(generatedNodeId));
-       nodeData.setData(ancestors,children,synonyms);
-       return nodeData;
+        ArrayList<String> ancestors = hbaseData.getAncestors(Integer.parseInt(generatedNodeId));
+        ArrayList<String> children = hbaseData.getChildren(Integer.parseInt(generatedNodeId));
+        ArrayList<String> synonyms = hbaseData.getSynonyms(Integer.parseInt(generatedNodeId));
+        nodeData.setData(ancestors,children,synonyms);
+        return nodeData;
+    }
+
+    public ArrayList<JSONObject> getJson(int[] generatedNodeIds) {
+        ArrayList<JSONObject> nodes = indexer.Neo4jToJson(generatedNodeIds);
+        return nodes;
+
     }
 
 }

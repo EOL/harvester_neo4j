@@ -1,10 +1,11 @@
-package org.bibalex.eol.neo4j.parser;
-        import org.bibalex.eol.neo4j.models.Node;
-        import org.neo4j.graphdb.Transaction;
+package org.bibalex.eol.neo4j.indexer;
+import org.bibalex.eol.neo4j.indexer.Neo4jIndexer;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class NeoMain {
-    public static void main(String[]args)
-    {
+    public static void main(String[]args) {
 //        Neo4jCommon instance = new Neo4jCommon();
 //        System.out.print(instance.autoId);
 //
@@ -27,8 +28,13 @@ public class NeoMain {
 //           int c2_id = instance.createAcceptedNode(1, "pc", "Opsimasaphus nobilis (Barrande, 1846)", "Class", 3);
 //            int id2 = instance.createAcceptedNode(1, "1944", "Aulacoparia quadrata (Hintze, 1952)", "Kingdom", 0);
 //            int pid = instance.createAcceptedNode(1, "1949", "Opsimasaphus ingens (Barrande, 1846)", "Kingdom", 0);
-    Neo4jIndexer instance = new Neo4jIndexer();
-    instance.getJsonFile(3);
-
+        Neo4jIndexer instance = new Neo4jIndexer();
+//        ArrayList<Integer> ids= new ArrayList<>();
+//        ids.add(1);
+//        ids.add(2);
+//        ids.add(3);
+//    instance.Neo4jToJson(ids);
+        int[] ids ={1, 2, 3, 4,9};
+        instance.Neo4jToJson(ids);
     }
 }

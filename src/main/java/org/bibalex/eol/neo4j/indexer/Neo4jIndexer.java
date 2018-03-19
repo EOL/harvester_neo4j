@@ -1,108 +1,109 @@
-package org.bibalex.eol.neo4j.parser;
+package org.bibalex.eol.neo4j.indexer;
 
-import org.bibalex.eol.neo4j.handlers.GlobalNamesHandler;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
+import org.json.simple.JSONObject;
 import org.neo4j.driver.v1.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
 public class Neo4jIndexer  extends HbaseData {
-    java.util.logging.Logger logger =  Logger.getLogger("getJsonFile");
-    ArrayList<String> synonymsSameResource = new ArrayList<>();
-    ArrayList<String> synonymsOtherResources = new ArrayList<>();
+    java.util.logging.Logger logger =  Logger.getLogger("neo4j indexing");
+
+
     GlobalNamesHandler globalNameHandler;
+    JsonFileWriter jsonFile;
 
-    public void getJsonFile (int generatedNodeId)  {
-        StatementResult result = getnNodeData ( generatedNodeId);
+    public ArrayList<JSONObject> Neo4jToJson (int[] generatedNodeIds) {
         globalNameHandler = new GlobalNamesHandler();
-
-        if (result.hasNext())
-        {
-            Record record = result.next();
-            String scientificName = record.get("n.scientific_name").asString();
-//            System.out.println(record);
-//            System.out.println("node's scientific name : "+record.get("n.scientific_name").asString());
-//            System.out.println("rank : " + record.get("n.rank").asString());
-//            System.out.println("resource : " + record.get("n.resource_id").asInt());
-//
-            getSynonymsNames( generatedNodeId,record.get("n.resource_id").asInt());
-//            for(int i=0;i< synonymsSameResource.size();i++)
-//            {
-//                System.out.println("same : " + synonymsSameResource.get(i));
-//            }
-//            for(int i=0;i< synonymsOtherResources.size();i++)
-//            {
-//                System.out.println("other : " + synonymsOtherResources.get(i));
-//            }
-//
-            ArrayList<String> ancestors = getAncestors( generatedNodeId);
-//            for(int i=0;i< ancestors.size();i++)
-//            {
-//                System.out.println(ancestors.get(li));
-//            }
-//
-            ArrayList<String>children = getChildrenName( generatedNodeId);
-//            for(int i=0;i< children.size();i++)
-//            {
-//                System.out.println(children.get(i));
-//            }
+        jsonFile =new JsonFileWriter();
+        for(int j=0 ; j<generatedNodeIds.length ; j++) {
+            int generatedNodeId = generatedNodeIds[j];
+            StatementResult result = getnNodeData(generatedNodeId);
 
 
-            for(int i=0;i< synonymsSameResource.size();i++)
-            {
-                System.out.println("same "+i+" "+globalNameHandler.getCanonicalName(synonymsSameResource.get(i)));
+            if (result.hasNext()) {
+                jsonFile.renew();
+                Record record = result.next();
+
+                String scientificName = record.get("n.scientific_name").asString();
+                String rank = record.get("n.rank").asString();
+                jsonFile.JsonAddString("scientific name", scientificName);
+                jsonFile.JsonAddString("Rank", rank);
+
+                Map<String,ArrayList<String>> synonymsMap=getSynonymsNames(generatedNodeId, record.get("n.resource_id").asInt());
+                jsonFile.JsonAddArray("synonyms", synonymsMap.get("synonyms same resource"));
+                jsonFile.JsonAddArray("other synonyms", synonymsMap.get("synonyms other resources"));
+
+
+                ArrayList<String> ancestors = getAncestors(generatedNodeId);
+                jsonFile.JsonAddArray("ancestors IDS", ancestors);
+
+                ArrayList<String> children = getChildrenName(generatedNodeId);
+                jsonFile.JsonAddArray("children names", children);
+
+
+                jsonFile.JsonAddArray("canonical synonyms", getCanonicalSynonymsSameResource(synonymsMap.get("synonyms same resource")));
+                jsonFile.JsonAddArray("other canonical synonyms", getCanonicalSynonymsOtherResources(synonymsMap.get("synonyms other resources")));
+                jsonFile.JsonAddString("is_hybrid", String.valueOf(globalNameHandler.isHybrid(scientificName)));
+                jsonFile.JsonAddString("canonical name", globalNameHandler.getCanonicalName(scientificName));
+
+
+
+
+                jsonFile.JsonAddNode(generatedNodeId);
+
+
+
             }
-            for(int i=0;i< synonymsOtherResources.size();i++)
-            {
-                System.out.println("other "+i+" "+globalNameHandler.getCanonicalName(synonymsOtherResources.get(i)));
-            }
-
-
-            System.out.println(globalNameHandler.isHybrid(scientificName));
-            System.out.println(globalNameHandler.getCanonicalName(scientificName));
-
-//            if(globalNameHandler.isHybrid(record.get("n.scientific_name").asString())){
-//                System.out.println();
-//            }
-
         }
 
-
-
+        ArrayList<JSONObject> nodes = jsonFile.getNodes();
+        jsonFile.printObj();
+        return nodes;
     }
 
     public  StatementResult getnNodeData (int generatedNodeId)
     {
-        String query = "MATCH (n:Node{generated_auto_id : {generatedNodeId}})"+
+        logger.info("Getting scientific name and rank of node with autoId" + generatedNodeId);
+        String query = "MATCH (n {generated_auto_id : {generatedNodeId}})"+
                 " RETURN n.scientific_name , n.rank , n.resource_id " ;
 
-        StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId ));
+        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId ));
 
         return result;
     }
 
-    public void getSynonymsNames(int generatedNodeId, int resource_id)
+    public Map getSynonymsNames(int generatedNodeId, int resource_id)
     {
         logger.info("Getting synonyms of node with autoId" + generatedNodeId);
-        String query = "MATCH (a:Node {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.scientific_name , s.resource_id";
-        StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
+        ArrayList<String> synonymsSameResource = new ArrayList<>();
+        ArrayList<String> synonymsOtherResources = new ArrayList<>();
+        String query = "MATCH (a {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.scientific_name , s.resource_id";
+        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         while (result.hasNext())
         {
             Record record = result.next();
             if(resource_id ==record.get("s.resource_id").asInt())
             {
-                synonymsSameResource.add(record.get("s.scientific_name").asString()+ "")  ;
+                synonymsSameResource.add(record.get("s.scientific_name").asString() + "")  ;
             }
 
             else
             {
-                synonymsOtherResources.add(record.get("s.scientific_name").asString()+ "")  ;
+                synonymsOtherResources.add(record.get("s.scientific_name").asString() + "")  ;
             }
 
         }
+        Map<String,ArrayList<String>> map =new HashMap();
+        map.put("synonyms same resource",synonymsSameResource);
+        map.put("synonyms other resources",synonymsOtherResources);
+        return map;
 
     }
 
@@ -110,13 +111,38 @@ public class Neo4jIndexer  extends HbaseData {
     {
         logger.info("Getting children of node with autoId" + generatedNodeId);
         ArrayList<String> children = new ArrayList<>();
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c.scientific_name";
+        String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c) return c.scientific_name";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
             Record record = result.next();
-            children.add(record.get("c.scientific_name").asString()+ "");
+            children.add(record.get("c.scientific_name").asString() + "");
         }
         return children;
     }
+
+    public  ArrayList<String> getCanonicalSynonymsSameResource(ArrayList<String> synonymsSameResource)
+    {   logger.info("Getting canonocal synonyms same resource of node" );
+        ArrayList<String> canonicalSynonymsSameResource = getCanonical(synonymsSameResource);
+        return canonicalSynonymsSameResource;
+
+    }
+
+    public  ArrayList<String> getCanonicalSynonymsOtherResources(ArrayList<String> synonymsOtherResources)
+    {   logger.info("Getting canonocal synonyms same resource of node" );
+        ArrayList<String> canonicalSynonymsOtherResources = getCanonical(synonymsOtherResources);
+        return canonicalSynonymsOtherResources ;
+    }
+
+    public ArrayList<String> getCanonical(ArrayList<String> synonymArray)
+    {
+        ArrayList<String> canonicalArray = new ArrayList<>();
+
+        for(int i=0 ; i < synonymArray.size() ; i++)
+        {
+            canonicalArray.add(globalNameHandler.getCanonicalName(synonymArray.get(i)));
+        }
+        return canonicalArray;
+    }
+
 }
