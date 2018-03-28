@@ -21,7 +21,7 @@ public class JsonFileWriter {
     public void renew ()
     {   logger.info("create new object and new node");
         obj  = new JSONObject();
-        node = new JSONObject();
+//        node = new JSONObject();
     }
 
     public void JsonAddString (String key ,String value)
@@ -42,14 +42,14 @@ public class JsonFileWriter {
 
         obj.put("generatedNodeId", generatedNodeId);
         logger.info("add node to array of nodes");
-        node.put("node" + generatedNodeId, obj);
-        nodes.add(node);
+//        node.put("node", obj);
+        nodes.add(obj);
 
     }
 
     public ArrayList<JSONObject> getNodes()
     {
-        logger.info("returni nodes json objects");
+        logger.info("return nodes json objects");
         return nodes;
     }
 
