@@ -31,6 +31,13 @@ public class JsonFileWriter {
 
     }
 
+    public void JsonAddInt (String key ,int value)
+    {
+        logger.info("adding int to json object with key: " + key + " and value: " + value);
+        obj.put(key, value);
+
+    }
+
     public void JsonAddArray (String key,ArrayList list)
     {
         logger.info("adding arraylist to json object with key: " + key);

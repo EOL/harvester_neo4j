@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static org.neo4j.driver.v1.Values.NULL;
 import static org.neo4j.driver.v1.Values.parameters;
 
 public class Neo4jIndexer  extends HbaseData {
@@ -30,11 +31,13 @@ public class Neo4jIndexer  extends HbaseData {
             if (result.hasNext()) {
                 jsonFile.renew();
                 Record record = result.next();
-
+//                System.out.println(record.get("n.page_id"));
+                int pageId = record.get("n.page_id")==NULL?-1:record.get("n.page_id").asInt();
                 String scientificName = record.get("n.scientific_name").asString();
                 String rank = record.get("n.rank").asString();
                 jsonFile.JsonAddString("scientific name", scientificName);
                 jsonFile.JsonAddString("Rank", rank);
+                jsonFile.JsonAddInt("page id",pageId);
 
                 Map<String,ArrayList<String>> synonymsMap=getSynonymsNames(generatedNodeId, record.get("n.resource_id").asInt());
                 jsonFile.JsonAddArray("synonyms", synonymsMap.get("synonyms same resource"));
@@ -44,8 +47,8 @@ public class Neo4jIndexer  extends HbaseData {
                 ArrayList<String> ancestors = getAncestors(generatedNodeId);
                 jsonFile.JsonAddArray("ancestors IDS", ancestors);
 
-                ArrayList<String> children = getChildrenName(generatedNodeId);
-                jsonFile.JsonAddArray("children names", children);
+                ArrayList<String> children = getChildren(generatedNodeId);
+                jsonFile.JsonAddArray("children IDS", children);
 
 
                 jsonFile.JsonAddArray("canonical synonyms", getCanonicalSynonymsSameResource(synonymsMap.get("synonyms same resource")));
@@ -72,7 +75,7 @@ public class Neo4jIndexer  extends HbaseData {
     {
         logger.info("Getting scientific name and rank of node with autoId" + generatedNodeId);
         String query = "MATCH (n {generated_auto_id : {generatedNodeId}})"+
-                " RETURN n.scientific_name , n.rank , n.resource_id " ;
+                " RETURN n.scientific_name, n.rank, n.resource_id, n.page_id" ;
 
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId ));
 

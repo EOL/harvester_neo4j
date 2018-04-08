@@ -180,4 +180,11 @@ public class Neo4jCommon {
         }
 
     }
+
+    public void addPageIdtoNode(int generatedNodeId , int pageId)
+    {
+        logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
+        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}}) SET n.page_id = {pageId}";
+        getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId));
+    }
 }

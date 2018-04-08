@@ -1,5 +1,6 @@
 package org.bibalex.eol.neo4j.indexer;
 import org.bibalex.eol.neo4j.indexer.Neo4jIndexer;
+import org.bibalex.eol.neo4j.parser.Neo4jCommon;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class NeoMain {
 //           int c2_id = instance.createAcceptedNode(1, "pc", "Opsimasaphus nobilis (Barrande, 1846)", "Class", 3);
 //            int id2 = instance.createAcceptedNode(1, "1944", "Aulacoparia quadrata (Hintze, 1952)", "Kingdom", 0);
 //            int pid = instance.createAcceptedNode(1, "1949", "Opsimasaphus ingens (Barrande, 1846)", "Kingdom", 0);
+//              instance.addPageIdtoNode(3,2);
+//              instance.addPageIdtoNode(2,1);
+
         Neo4jIndexer instance = new Neo4jIndexer();
 //        ArrayList<Integer> ids= new ArrayList<>();
 //        ids.add(1);
