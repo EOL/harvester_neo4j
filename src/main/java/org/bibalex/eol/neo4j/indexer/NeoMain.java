@@ -32,13 +32,15 @@ public class NeoMain {
 //              instance.addPageIdtoNode(3,2);
 //              instance.addPageIdtoNode(2,1);
 
+
+
         Neo4jIndexer instance = new Neo4jIndexer();
 //        ArrayList<Integer> ids= new ArrayList<>();
 //        ids.add(1);
 //        ids.add(2);
 //        ids.add(3);
 //    instance.Neo4jToJson(ids);
-        int[] ids ={1, 2, 3, 4,9};
+        int[] ids ={1, 2, 3, 4,9,16};
         instance.Neo4jToJson(ids);
     }
 }

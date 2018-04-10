@@ -31,10 +31,14 @@ public class Neo4jIndexer  extends HbaseData {
             if (result.hasNext()) {
                 jsonFile.renew();
                 Record record = result.next();
-//                System.out.println(record.get("n.page_id"));
+
+                //if page_id is null -1 will be retuened
+                //scientific name can't be null but can be empty string("") will return "" same for canonical name
+                //rank can be null and can be empty string will return in both cases ""
                 int pageId = record.get("n.page_id")==NULL?-1:record.get("n.page_id").asInt();
-                String scientificName = record.get("n.scientific_name").asString();
-                String rank = record.get("n.rank").asString();
+                String scientificName =  record.get("n.scientific_name").asString();
+                String rank = record.get("n.rank")== NULL ? "" : record.get("n.rank").asString();
+                String canonicalName =scientificName.equals("")?"": globalNameHandler.getCanonicalName(scientificName);
                 jsonFile.JsonAddString("scientific name", scientificName);
                 jsonFile.JsonAddString("Rank", rank);
                 jsonFile.JsonAddInt("page id",pageId);
@@ -54,7 +58,7 @@ public class Neo4jIndexer  extends HbaseData {
                 jsonFile.JsonAddArray("canonical synonyms", getCanonicalSynonymsSameResource(synonymsMap.get("synonyms same resource")));
                 jsonFile.JsonAddArray("other canonical synonyms", getCanonicalSynonymsOtherResources(synonymsMap.get("synonyms other resources")));
                 jsonFile.JsonAddString("is_hybrid", String.valueOf(globalNameHandler.isHybrid(scientificName)));
-                jsonFile.JsonAddString("canonical name", globalNameHandler.getCanonicalName(scientificName));
+                jsonFile.JsonAddString("canonical name", canonicalName);
 
 
 
