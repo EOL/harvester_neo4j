@@ -90,11 +90,10 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
                 CommonDeleteMethod(nodeGeneratedId);
 
             }
-            int find_node = getAcceptedNodeIfExist(nodeId, scientificName, resourceId);
-            if (find_node == -1)
-                return true;
-            else
+            if(checkIfNodeExists(nodeGeneratedId))
                 return false;
+            else
+                return true;
 
         }
         else
