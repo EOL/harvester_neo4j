@@ -1,6 +1,5 @@
 package org.bibalex.eol.neo4j.api;
 
-//import org.bibalex.eol.neo4j.backend_api.Neo4jForest;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +34,12 @@ public class NodesController {
         return generatedNodeId;
     }
 
-     @RequestMapping(value="/createSynonymRelation/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-     public boolean createSynonymRelation(@RequestBody Node n)
-    {
-        boolean  created = service.createRelationBetweenNodeAndSynonyms(n);
-        return created;
-    }
+//     @RequestMapping(value="/createSynonymRelation/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+//     public boolean createSynonymRelation(@RequestBody Node n)
+//    {
+//        boolean  created = service.createRelationBetweenNodeAndSynonyms(n);
+//        return created;
+//    }
 
      @RequestMapping(value="/createAncestorNode/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
      public int createAncestorNode(@RequestBody Node n)
@@ -55,6 +54,22 @@ public class NodesController {
     {
         int  generatedNodeId = service.createParentNode(n);
         return generatedNodeId;
+    }
+
+
+    @RequestMapping(value="/deleteNodeAncestoryFormat/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public boolean deleteNodeAncestorForm(@RequestBody Node n)
+    {
+        boolean result = service.deleteNodeAncestoryFormat(n);
+        return result;
+    }
+
+
+    @RequestMapping(value="/deleteNodeParentFormat/", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public boolean deleteNodeParentForm(@RequestBody Node n)
+    {
+        boolean result = service.deleteNodeParentFormat(n);
+        return result;
     }
 
 
@@ -93,5 +108,6 @@ public class NodesController {
         ArrayList<Neo4jTree> trees = service.getUpdates(timestamp);
         return trees;
     }
+
 
 }

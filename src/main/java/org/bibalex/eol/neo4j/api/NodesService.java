@@ -55,11 +55,23 @@ public class NodesService {
        return n.getGeneratedNodeId();
     }
 
-    public boolean createRelationBetweenNodeAndSynonyms(Node n)
+    public boolean deleteNodeAncestoryFormat(Node n)
     {
-        boolean created = parser.createRelationBetweenNodeAndSynonyms(n.getAcceptedNodeGeneratedId(), n.getGeneratedNodeId());
-        return created;
+        boolean result  = aNode.deleteNodeAncestoryFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
+        return result;
     }
+
+    public boolean deleteNodeParentFormat(Node n)
+    {
+        boolean result  = pNode.deleteNodeParentFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
+        return result;
+    }
+
+//    public boolean createRelationBetweenNodeAndSynonyms(Node n)
+//    {
+//        boolean created = parser.createRelationBetweenNodeAndSynonyms(n.getAcceptedNodeGeneratedId(), n.getGeneratedNodeId());
+//        return created;
+//    }
 
     public int getNode(Node n)
     {

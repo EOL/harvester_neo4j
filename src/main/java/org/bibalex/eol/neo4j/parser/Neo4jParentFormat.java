@@ -9,25 +9,62 @@ public class Neo4jParentFormat extends Neo4jCommon  {
 
     public int createParentWithPlaceholder(int resourceId, String parentUsageId)
     {
-        autoId = getAutoId();
-        String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {parentUsageId}," +
-                " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
-                " created_at: apoc.date.currentTimestamp(),updated_at: apoc.date.currentTimestamp()})" +
-                "RETURN n.generated_auto_id";
-        StatementResult result = getSession().run(create_query, parameters( "resourceId", resourceId,
-                "parentUsageId", parentUsageId, "scientificName", "placeholder", "rank", "placeholder", "autoId", autoId ));
-        autoId ++;
-        if (result.hasNext())
+        int nodeGeneratedNodeId = getNodeIfExist(parentUsageId, resourceId);
+        if (nodeGeneratedNodeId == -1)
         {
-            logger.debug("Node with id " + parentUsageId + " created with placeholders");
-            Record record = result.next();
-            return record.get("n.generated_auto_id").asInt();
+            autoId = getAutoId();
+            String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {parentUsageId}," +
+                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
+                    " created_at: apoc.date.currentTimestamp(),updated_at: apoc.date.currentTimestamp()})" +
+                    "RETURN n.generated_auto_id";
+            StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
+                    "parentUsageId", parentUsageId, "scientificName", "placeholder", "rank", "placeholder", "autoId", autoId));
+            autoId++;
+            if (result.hasNext()) {
+                logger.debug("Node with id " + parentUsageId + " created with placeholders");
+                Record record = result.next();
+                return record.get("n.generated_auto_id").asInt();
+            } else {
+                logger.debug("Node with id  " + parentUsageId + " is not created a problem has occurred");
+                return -1;
+            }
         }
         else
         {
-            logger.debug("Node with id  "+ parentUsageId + " is not created a problem has occured");
-            return -1;
+            logger.debug("Node with nodeId "+ parentUsageId +"  found");
+            return nodeGeneratedNodeId;
         }
 
     }
+
+
+    public boolean deleteNodeParentFormat(String nodeId, int resourceId, String scientificName)
+    {
+        logger.debug("Deleting Node with nodeId " + nodeId + " of resource " + resourceId );
+        int nodeGeneratedId = getAcceptedNodeIfExist(nodeId, scientificName, resourceId);
+        if (nodeGeneratedId != -1)
+        {
+            if (hasChildren(nodeGeneratedId))
+            {
+                logger.debug("Node has children so just delete");
+                deleteNode(nodeGeneratedId);
+            }
+            else
+            {
+                CommonDeleteMethod(nodeGeneratedId);
+
+            }
+            int find_node = getAcceptedNodeIfExist(nodeId, scientificName, resourceId);
+            if (find_node == -1)
+                return true;
+            else
+                return false;
+
+        }
+        else
+            return false;
+
+    }
+
+
 }
