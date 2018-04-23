@@ -12,6 +12,7 @@ import org.neo4j.driver.v1.Session;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Service
 public class NodesService {
@@ -67,11 +68,11 @@ public class NodesService {
         return result;
     }
 
-//    public boolean createRelationBetweenNodeAndSynonyms(Node n)
-//    {
-//        boolean created = parser.createRelationBetweenNodeAndSynonyms(n.getAcceptedNodeGeneratedId(), n.getGeneratedNodeId());
-//        return created;
-//    }
+    public boolean createRelationBetweenNodeAndSynonyms(Node n)
+    {
+        boolean created = parser.createRelationBetweenNodeAndSynonyms(n.getAcceptedNodeGeneratedId(), n.getGeneratedNodeId());
+        return created;
+    }
 
     public int getNode(Node n)
     {
@@ -105,8 +106,32 @@ public class NodesService {
 
     public ArrayList<Neo4jTree> getUpdates(String timestamp)
     {
-         ArrayList<Neo4jTree> trees=forest.getTrees(timestamp);
+         ArrayList<Neo4jTree> trees=forest.getTreeUpdates(timestamp);
          return trees;
+    }
+
+
+    public ArrayList<Neo4jTree> getResourceTrees(int resourceId)
+    {
+        ArrayList<Neo4jTree> trees=forest.getTrees(resourceId);
+        return trees;
+    }
+
+    public HashMap<Integer,Integer> getParentNodes(ArrayList<Integer> nodeIds)
+    {
+        HashMap<Integer,Integer> ParentNodes = new HashMap<>();
+        nodeIds.forEach((nodeId) -> {
+            int parentGeneratedNodeId;
+            parentGeneratedNodeId = parser.getParent((int)nodeId);
+            ParentNodes.put(nodeId,parentGeneratedNodeId);
+        });
+        return ParentNodes;
+    }
+
+    public ArrayList<Node> getRoots()
+    {
+        ArrayList<Node> roots = parser.getRootNodes();
+        return roots;
     }
 
 }
