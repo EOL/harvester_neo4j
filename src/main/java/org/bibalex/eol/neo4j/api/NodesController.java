@@ -146,10 +146,10 @@ public class NodesController {
         return parents;
     }
 
-    @RequestMapping(value="/getRootNodes", method = RequestMethod.GET, produces = "application/json")
-    public ArrayList<Node> getRootNodes()
+    @RequestMapping(value="/getRootNodes/{resourceId}", method = RequestMethod.GET, produces = "application/json")
+    public ArrayList<Node> getRootNodes(@PathVariable("resourceId") int resourceId)
     {
-        ArrayList <Node> roots = service.getRoots();
+        ArrayList <Node> roots = service.getRoots(resourceId);
         return roots;
     }
 

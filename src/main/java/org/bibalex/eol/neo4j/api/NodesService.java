@@ -148,9 +148,9 @@ public class NodesService {
         return ParentNodes;
     }
 
-    public ArrayList<Node> getRoots()
+    public ArrayList<Node> getRoots(int resourceId)
     {
-        ArrayList<Node> roots = TaxonM.getRootNodes();
+        ArrayList<Node> roots = TaxonM.getRootNodes(resourceId);
         return roots;
     }
 

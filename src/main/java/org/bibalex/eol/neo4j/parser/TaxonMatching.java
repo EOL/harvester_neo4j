@@ -66,17 +66,17 @@ public class TaxonMatching extends Neo4jCommon{
         return children;
     }
 
-    public ArrayList<Node> getRootNodes()
+    public ArrayList<Node> getRootNodes(int resourceId)
     {
-        String query = "MATCH (n: Root) RETURN n";
-        StatementResult result = getSession().run(query);
+        String query = "MATCH (n:Root {resource_id:{resourceId}}) RETURN n";
+        StatementResult result = getSession().run(query,parameters("resourceId", resourceId));
         ArrayList<Node> roots = new ArrayList<>();
         while (result.hasNext())
         {
             Record record = result.next();
             Node node = new Node();
             Value  node_data = record.get("n");
-            if( node_data.get("generated_auto_id")!= NULL ){node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());}
+            if(node_data.get("generated_auto_id")!= NULL ){node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());}
             if(node_data.get("node_id")!= NULL){node.setNodeId(node_data.get("node_id").toString());}
             if(node_data.get("resource_id")!= NULL){node.setResourceId(node_data.get("resource_id").asInt());}
             if(node_data.get("rank")!= NULL){node.setRank(node_data.get("rank").asString());}

@@ -2,53 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83480fb5-b93d-4bbb-a371-76380e011cd6" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_neo4j_driver_neo4j_java_driver_1_5_0.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.counts.db.a" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.counts.db.a" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.counts.db.b" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.counts.db.b" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.labelscanstore.db" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.labelscanstore.db" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.labeltokenstore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.labeltokenstore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.labeltokenstore.db.names.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.labeltokenstore.db.names.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.nodestore.db" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.nodestore.db" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.nodestore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.nodestore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.nodestore.db.labels.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.nodestore.db.labels.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.arrays.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.arrays.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.index.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.index.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.index.keys.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.index.keys.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.strings.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.propertystore.db.strings.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshipgroupstore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshipgroupstore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshipstore.db" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshipstore.db" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshipstore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshipstore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshiptypestore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshiptypestore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshiptypestore.db.names.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.relationshiptypestore.db.names.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.schemastore.db.id" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.schemastore.db.id" />
-      <change beforePath="$PROJECT_DIR$/data/databases/graph.db/neostore.transaction.db.0" afterPath="$PROJECT_DIR$/data/databases/graph.db/neostore.transaction.db.0" />
-      <change beforePath="$PROJECT_DIR$/neo4j.iml" afterPath="$PROJECT_DIR$/neo4j.iml" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesController.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesController.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/hbase/HbaseData.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/hbase/HbaseData.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/models/Node.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/models/Node.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jAncestryFormat.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jAncestryFormat.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jCommon.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jCommon.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/NeoMain.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/NeoMain.java" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/Neo4jSpringAPI.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/Neo4jSpringAPI.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/api/NodesController.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/api/NodesController.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/api/NodesService.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/api/NodesService.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/hbase/HbaseData.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/hbase/HbaseData.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/models/Node.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/models/Node.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/models/NodesData.class" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/parser/Neo4jAncestoryFormat.class" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/parser/Neo4jCommon.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/parser/Neo4jCommon.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/parser/Neo4jMain.class" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.class" afterPath="$PROJECT_DIR$/target/classes/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.class" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java" afterPath="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -64,12 +20,12 @@
       <file leaf-file-name="NodesService.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="176" column="25" lean-forward="false" selection-start-line="176" selection-start-column="25" selection-end-line="176" selection-end-column="25" />
+            <state relative-caret-position="214">
+              <caret line="152" column="62" lean-forward="false" selection-start-line="152" selection-start-column="62" selection-end-line="152" selection-end-column="62" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#5900#5901#0" expanded="true" />
-                <element signature="e#5962#5963#0" expanded="true" />
+                <element signature="e#5924#5925#0" expanded="true" />
+                <element signature="e#5986#5987#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -78,8 +34,8 @@
       <file leaf-file-name="NodesController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="254">
-              <caret line="155" column="28" lean-forward="true" selection-start-line="155" selection-start-column="28" selection-end-line="155" selection-end-column="40" />
+            <state relative-caret-position="-2">
+              <caret line="140" column="0" lean-forward="false" selection-start-line="140" selection-start-column="0" selection-end-line="140" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -120,7 +76,7 @@
       <file leaf-file-name="Neo4jParentFormat.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1278">
+            <state relative-caret-position="18">
               <caret line="75" column="27" lean-forward="false" selection-start-line="75" selection-start-column="19" selection-end-line="75" selection-end-column="27" />
               <folding />
             </state>
@@ -130,8 +86,8 @@
       <file leaf-file-name="TaxonMatching.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1692">
-              <caret line="94" column="16" lean-forward="false" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
+            <state relative-caret-position="35">
+              <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -142,8 +98,8 @@
       <file leaf-file-name="Neo4jCommon.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jCommon.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7488">
-              <caret line="426" column="0" lean-forward="false" selection-start-line="426" selection-start-column="0" selection-end-line="426" selection-end-column="0" />
+            <state relative-caret-position="236">
+              <caret line="236" column="84" lean-forward="false" selection-start-line="236" selection-start-column="57" selection-end-line="236" selection-end-column="84" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -197,6 +153,7 @@
       <find>getr</find>
       <find>getchildren</find>
       <find>children</find>
+      <find>getroot</find>
     </findStrings>
     <replaceStrings>
       <replace>getSession</replace>
@@ -244,10 +201,10 @@
         <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/models/Node.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jAncestryFormat.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jCommon.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/NeoMain.java" />
+        <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java" />
       </list>
     </option>
   </component>
@@ -546,10 +503,11 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.08342246" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19315673" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27924946" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27924946" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21871658" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32760474" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -562,7 +520,6 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32781458" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32760474" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -779,37 +736,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/models/Node.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1278">
-          <caret line="127" column="18" lean-forward="false" selection-start-line="127" selection-start-column="18" selection-end-line="127" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1278">
-          <caret line="75" column="27" lean-forward="false" selection-start-line="75" selection-start-column="19" selection-end-line="75" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/NeoMain.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2124">
           <caret line="121" column="33" lean-forward="false" selection-start-line="121" selection-start-column="33" selection-end-line="121" selection-end-column="33" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jCommon.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7488">
-          <caret line="426" column="0" lean-forward="false" selection-start-line="426" selection-start-column="0" selection-end-line="426" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -829,32 +760,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/models/Node.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="176" column="25" lean-forward="false" selection-start-line="176" selection-start-column="25" selection-end-line="176" selection-end-column="25" />
+        <state relative-caret-position="1278">
+          <caret line="127" column="18" lean-forward="false" selection-start-line="127" selection-start-column="18" selection-end-line="127" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jParentFormat.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="75" column="27" lean-forward="false" selection-start-line="75" selection-start-column="19" selection-end-line="75" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/Neo4jCommon.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="236" column="84" lean-forward="false" selection-start-line="236" selection-start-column="57" selection-end-line="236" selection-end-column="84" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#5900#5901#0" expanded="true" />
-            <element signature="e#5962#5963#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="254">
-          <caret line="155" column="28" lean-forward="true" selection-start-line="155" selection-start-column="28" selection-end-line="155" selection-end-column="40" />
+        <state relative-caret-position="-2">
+          <caret line="140" column="0" lean-forward="false" selection-start-line="140" selection-start-column="0" selection-end-line="140" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/api/NodesService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="152" column="62" lean-forward="false" selection-start-line="152" selection-start-column="62" selection-end-line="152" selection-end-column="62" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#5924#5925#0" expanded="true" />
+            <element signature="e#5986#5987#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/org/bibalex/eol/neo4j/parser/TaxonMatching.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1692">
-          <caret line="94" column="16" lean-forward="false" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
+        <state relative-caret-position="35">
+          <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
