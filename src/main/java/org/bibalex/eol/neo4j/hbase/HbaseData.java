@@ -17,7 +17,7 @@ public class HbaseData extends Neo4jCommon{
     {
         logger.info("Getting ancestors of node with autoId" + generatedNodeId);
         ArrayList<String> ancestors = new ArrayList<>();
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})<-[:IS_PARENT_OF*]-(p:Node) return p.generated_auto_id";
+        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})<-[:IS_PARENT_OF*]-(p) return p.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
@@ -31,7 +31,7 @@ public class HbaseData extends Neo4jCommon{
     {
         logger.info("Getting children of node with autoId" + generatedNodeId);
         ArrayList<String> children = new ArrayList<>();
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c.generated_auto_id";
+        String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
@@ -46,7 +46,7 @@ public class HbaseData extends Neo4jCommon{
     {
         logger.info("Getting synonyms of node with autoId" + generatedNodeId);
         ArrayList<String> synonyms = new ArrayList<>();
-        String query = "MATCH (a:Node {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.generated_auto_id";
+        String query = "MATCH (a {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {

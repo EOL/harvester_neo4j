@@ -85,6 +85,25 @@ public class Neo4jCommon {
         }
     }
 
+    public int createNodewithFulldata(int resourceId, String nodeId, String scientificName, String rank,
+                                      int parentGeneratedNodeId)
+    {
+        int nodeGeneratedId = getNodeIfExist(nodeId, resourceId);
+        if(nodeGeneratedId != -1)
+        {
+            logger.debug("Node is found but needs to update its data");
+            UpdateScientificName(nodeGeneratedId, scientificName);
+            UpdateRank(nodeGeneratedId, rank);
+            createChildParentRelation(parentGeneratedNodeId, nodeGeneratedId);
+        }
+        else
+        {
+            nodeGeneratedId = createAcceptedNode(resourceId, nodeId, scientificName, rank, parentGeneratedNodeId);
+            logger.debug("Node is not found so created");
+        }
+        return nodeGeneratedId;
+    }
+
     public void createChildParentRelation(int parentGeneratedNodeId, int childGeneratedNodeId) {
         boolean node_exists = checkIfNodeExists(childGeneratedNodeId);
         boolean parent_exists = checkIfNodeExists(parentGeneratedNodeId);
@@ -232,7 +251,7 @@ public class Neo4jCommon {
     {
         int parentGeneratedNodeId;
         logger.debug("Get parent of node with autoId  " + generatedNodeId );
-        String query = "MATCH(a:Node {generated_auto_id : {generatedNodeId}})<-[:IS_PARENT_OF]-(n) RETURN n.generated_auto_id";
+        String query = "MATCH(a:Node {generated_auto_id : {generatedNodeId}})<-[:IS_PARENT_OF*]-(n) RETURN n.generated_auto_id LIMIT 1";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         if(result.hasNext())
         {
@@ -293,6 +312,7 @@ public class Neo4jCommon {
             logger.debug("Node has no siblings");
             if(parentGeneratedNodeId != -1 && !parenthasNodeId(parentGeneratedNodeId))
             {
+                //TODO: check this with the case reported by Mirona
                 logger.debug("Parent is placeholder node");
                 CommonDeleteMethod(parentGeneratedNodeId);
             }
@@ -313,7 +333,7 @@ public class Neo4jCommon {
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         Record record = result.next();
         String nodeId = record.get("n.node_id").toString().replace("\"", "");
-        if (nodeId.equals("pc")) {
+        if (nodeId.equals("placeholder")) {
             logger.debug("This node has nodeId as placeholder");
             return false;
         }
@@ -329,7 +349,7 @@ public class Neo4jCommon {
     {
         logger.info("Get data of  node with generatedNodeId" + generatedNodeId);
         Node node = new Node();
-        String query = "MATCH (n:Node{ n.generated_auto_id = {generatedNodeId}}) return n";
+        String query = "MATCH (n {generated_auto_id : {generatedNodeId}}) return n";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
@@ -346,21 +366,35 @@ public class Neo4jCommon {
     }
 
 
-    public void UpdateScientificName(int generatedNodeId, String ScientificName)
+    public boolean UpdateScientificName(int generatedNodeId, String ScientificName)
     {
         logger.debug("Update Scientific Name of  node with generatedNodeId " + generatedNodeId);
-        String query = "MATCH(n {generated_auto_id : {generatedNodeId}}) SET n.scientific_name = {ScientificName}";
-         getSession().run(query, parameters("generatedNodeId", generatedNodeId,
+        String query = "MATCH(n {generated_auto_id : {generatedNodeId}}) SET n.scientific_name = {ScientificName} RETURN n.generated_auto_id";
+        StatementResult result =  getSession().run(query, parameters("generatedNodeId", generatedNodeId,
                 "ScientificName", ScientificName));
+        if (result.hasNext())
+         return true;
+        else
+        {
+            logger.debug("Problem occurred while updating scientific name");
+            return false;
+        }
 
     }
 
-    public void UpdateRank(int generatedNodeId, String rank)
+    public boolean UpdateRank(int generatedNodeId, String rank)
     {
         logger.debug("Update rank of  node with generatedNodeId " + generatedNodeId);
-        String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) SET n.rank = {rank}";
-        getSession().run(query, parameters("generatedNodeId", generatedNodeId,
+        String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) SET n.rank = {rank} RETURN n.generated_auto_id";
+        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId,
                 "rank", rank));
+        if (result.hasNext())
+            return true;
+        else
+        {
+            logger.debug("Problem occurred while updating scientific name");
+            return false;
+        }
 
     }
 
@@ -390,33 +424,9 @@ public class Neo4jCommon {
     }
 
     // Taxon Matching requests
-    public void addPageIdtoNode(int generatedNodeId , int pageId)
-    {
-        logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}}) SET n.page_id = {pageId}";
-        getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId));
-    }
 
-    public ArrayList<Node> getRootNodes()
-    {
-        String query = "MATCH (n: Root) RETURN n";
-        StatementResult result = getSession().run(query);
-        ArrayList<Node> roots = new ArrayList<>();
-        while (result.hasNext())
-        {
-            Record record = result.next();
-            Node node = new Node();
-            Value  node_data = record.get("n");
-            node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());
-            node.setNodeId(node_data.get("node_id").toString());
-            node.setResourceId(node_data.get("resource_id").asInt());
-            node.setRank(node_data.get("rank").asString());
-            node.setScientificName(node_data.get("scientific_name").asString());
 
-            roots.add(node);
-        }
-       return roots;
-    }
+
 
 
 }

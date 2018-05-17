@@ -58,19 +58,39 @@ public class NodesController {
         return generatedNodeId;
     }
 
+    @RequestMapping(value="/createNodewithFulldata", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public int createNodewithFulldata(@RequestBody Node n)
+    {
+        int  generatedNodeId = service.createNodewithFulldata(n);
+        return generatedNodeId;
+    }
 
     @RequestMapping(value="/deleteNodeAncestoryFormat", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public boolean deleteNodeAncestorForm(@RequestBody Node n)
+    public int deleteNodeAncestorForm(@RequestBody Node n)
     {
-        boolean result = service.deleteNodeAncestoryFormat(n);
-        return result;
+        int node_deleted_id = service.deleteNodeAncestoryFormat(n);
+        return node_deleted_id;
     }
 
 
     @RequestMapping(value="/deleteNodeParentFormat", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public boolean deleteNodeParentForm(@RequestBody Node n)
+    public int deleteNodeParentForm(@RequestBody Node n)
     {
-        boolean result = service.deleteNodeParentFormat(n);
+        int node_deleted_id = service.deleteNodeParentFormat(n);
+        return node_deleted_id;
+    }
+
+    @RequestMapping(value="/updateNodeParentFormat/{parentNodeId}", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public int updateNodeParentForm(@RequestBody Node n , @PathVariable("parentNodeId") String parentNodeId)
+    {
+        int result = service.updateNodeParentFormat(n,parentNodeId);
+        return result;
+    }
+
+    @RequestMapping(value = "/updateNodeAncestoryFormat", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public boolean updateNodeAncestoryFormat(@RequestBody ArrayList<Node> nodes)
+    {
+        boolean result = service.updateNodeAncestoryFormat(nodes);
         return result;
     }
 
@@ -133,6 +153,33 @@ public class NodesController {
         return roots;
     }
 
+    @RequestMapping(value="/getAncestors/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
+    public ArrayList<Node> getAncestors(@PathVariable("generatedNodeId") int generatedNodeId)
+    {
+        ArrayList<Node> ancestors = service.getAncestors(generatedNodeId);
+        return ancestors;
+    }
 
+    @RequestMapping(value="/getChildren/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
+    public ArrayList<Node> getchildren(@PathVariable("generatedNodeId") int generatedNodeId)
+    {
+        ArrayList<Node> children = service.getChildren(generatedNodeId);
+        return children;
+    }
+
+    @RequestMapping(value="/hasChildren/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
+    public boolean hasChildren(@PathVariable("generatedNodeId") int generatedNodeId)
+    {
+        boolean children = service.hasChildren(generatedNodeId);
+        return children;
+    }
+
+    @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}/{pageId}", method = RequestMethod.POST, produces = "application/json")
+    public void addPageIdtoNode( @PathVariable("generatedNodeId") int generatedNodeId , @PathVariable("pageId") int pageId )
+    {
+
+         service.addPageIdtoNode(generatedNodeId,pageId);
+
+    }
 
 }

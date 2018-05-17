@@ -13,6 +13,7 @@ public class Node implements Serializable{
     String parentNodeId;
     String acceptedNodeId;
     int acceptedNodeGeneratedId;
+    int pageId;
     long created_at;
     long updated_at;
 
@@ -126,4 +127,9 @@ public class Node implements Serializable{
     {
         this.updated_at = updated_at;
     }
+
+    public void setPageId(int pageId){this.pageId = pageId;}
+
+    public int getPageId(){return pageId;}
+
 }
