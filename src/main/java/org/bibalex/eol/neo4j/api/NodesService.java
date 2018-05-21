@@ -172,8 +172,9 @@ public class NodesService {
         return children;
     }
 
-    public void addPageIdtoNode(int generatedNodeId , int pageId)
+    public boolean addPageIdtoNode(int generatedNodeId , int pageId)
     {
-        TaxonM.addPageIdtoNode(generatedNodeId,pageId);
+       boolean flag = TaxonM.addPageIdtoNode(generatedNodeId,pageId);
+       return flag;
     }
 }

@@ -118,8 +118,12 @@ public class NeoMain {
 
 
         TaxonMatching test =  new TaxonMatching();
-//        ArrayList<Node> n= test.getChildrenNode(1);
-        test.addPageIdtoNode(10,2);
+//     ArrayList<Node> n= test.getChildrenNode(3);
+//        System.out.println(n.get(0).getCreated_at());
+//      boolean flag= test.addPageIdtoNode(10,3);
+//        System.out.println(flag);
+        ArrayList<Node> n= test.getAncestorsNodes(3);
+         System.out.println(n.get(0).getCreated_at());
 
 
 

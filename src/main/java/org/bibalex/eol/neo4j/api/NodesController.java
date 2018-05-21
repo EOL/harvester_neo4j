@@ -174,11 +174,12 @@ public class NodesController {
         return children;
     }
 
-    @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}/{pageId}", method = RequestMethod.POST, produces = "application/json")
-    public void addPageIdtoNode( @PathVariable("generatedNodeId") int generatedNodeId , @PathVariable("pageId") int pageId )
+    @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}/{pageId}", method = RequestMethod.GET, produces = "application/json")
+    public boolean addPageIdtoNode( @PathVariable("generatedNodeId") int generatedNodeId , @PathVariable("pageId") int pageId )
     {
 
-         service.addPageIdtoNode(generatedNodeId,pageId);
+       boolean flag =  service.addPageIdtoNode(generatedNodeId,pageId);
+       return flag;
 
     }
 
