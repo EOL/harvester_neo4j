@@ -1,13 +1,20 @@
 package org.bibalex.eol.neo4j.parser;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.minidev.json.JSONObject;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.Node;
+import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.*;
 
 public class NeoMain {
-    public static void main(String[]args)
-    {
+    public static void main(String[]args) throws IOException {
 //        Neo4jCommon instance = new Neo4jCommon();
 ////        System.out.print(instance.autoId);
 ////        instance.initialze();
@@ -122,8 +129,9 @@ public class NeoMain {
 //        System.out.println(n.get(0).getCreated_at());
 //      boolean flag= test.addPageIdtoNode(10,3);
 //        System.out.println(flag);
-        ArrayList<Node> n= test.getAncestorsNodes(3);
-         System.out.println(n.get(0).getCreated_at());
+//        ArrayList<Node> rootNodes= test.getRootNodes(1);
+//         Node node=rootNodes.get(0);
+//        System.out.println(node.getNodeId());
 
 
 

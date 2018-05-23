@@ -1,8 +1,9 @@
 package org.bibalex.eol.neo4j.models;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
-public class Node implements Serializable{
+public class Node implements  Serializable {
 
     String nodeId;
     int resourceId;
