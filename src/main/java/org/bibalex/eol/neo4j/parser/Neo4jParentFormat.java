@@ -20,6 +20,12 @@ public class Neo4jParentFormat extends Neo4jCommon  {
                     "RETURN n.generated_auto_id";
             StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
                     "parentUsageId", parentUsageId, "scientificName", "placeholder", "rank", "placeholder", "autoId", autoId));
+            if(parentUsageId == "0")
+            {
+                logger.debug("Node is a root node");
+                create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
+                result = getSession().run(create_query, parameters("autoId", autoId));
+            }
             autoId++;
             if (result.hasNext()) {
                 logger.debug("Node with id " + parentUsageId + " created with placeholders");
@@ -41,10 +47,10 @@ public class Neo4jParentFormat extends Neo4jCommon  {
     public int getNodeGivenParentIfExists(int resourceId, String scientificName, String rank, String nodeId, int parentGeneratedNodeId)
     {
         String query = "MATCH (n {resource_id: {resourceId} , scientific_name: {scientificName}," +
-                " rank: {rank}, nodeId: {nodeId}})<-[r:IS_PARENT_OF]-(p {generated_auto_id: {parentGeneratedNodeId}}) RETURN n.generated_auto_id UNION" +
+                " rank: {rank}, node_id: {nodeId}})<-[r:IS_PARENT_OF]-(p {generated_auto_id: {parentGeneratedNodeId}}) RETURN n.generated_auto_id LIMIT 1 UNION" +
                 " MATCH (n:Root {resource_id: {resourceId} , scientific_name: {scientificName}, rank: {rank}}) RETURN n.generated_auto_id";
         StatementResult result = getSession().run(query, parameters( "resourceId",resourceId,
-                "scientificName", scientificName, "rank", rank , "parentGeneratedNodeId", parentGeneratedNodeId));
+                "scientificName", scientificName, "rank", rank ,"nodeId", nodeId, "parentGeneratedNodeId", parentGeneratedNodeId));
         if (result.hasNext())
         {
             Record record = result.next();
@@ -61,8 +67,7 @@ public class Neo4jParentFormat extends Neo4jCommon  {
     }
 
 
-
-    public boolean deleteNodeParentFormat(String nodeId, int resourceId, String scientificName)
+    public int deleteNodeParentFormat(String nodeId, int resourceId, String scientificName)
     {
         logger.debug("Deleting Node with nodeId " + nodeId + " of resource " + resourceId );
         int nodeGeneratedId = getAcceptedNodeIfExist(nodeId, scientificName, resourceId);
@@ -79,72 +84,160 @@ public class Neo4jParentFormat extends Neo4jCommon  {
 
             }
             if(checkIfNodeExists(nodeGeneratedId))
-                return false;
+                return -1;
             else
-                return true;
+                return nodeGeneratedId;
 
         }
         else
-            return false;
+            return -1;
 
     }
 
-    public boolean UpdateNodeParentFormat (Node new_node, Node new_parent)
+    public void deleteOldParentRelation(int nodegeneratedId, int oldParentId)
     {
-        int nodegeneratedId = getNodeIfExist(new_node.getNodeId(), new_node.getResourceId());
-        if (nodegeneratedId != -1)
+        logger.debug("Deleting relation between node and its old parent");
+        String query = "MATCH(n {generated_auto_id: {nodegeneratedId}})<-[r:IS_PARENT_OF]-(p {generated_auto_id: {oldParentId}}) DELETE r RETURN  n.generated_auto_id";
+        StatementResult result = getSession().run(query, parameters("nodegeneratedId", nodegeneratedId, "oldParentId", oldParentId));
+        if (result.hasNext())
+            logger.debug("Old relation deleted");
+        else
+            logger.debug("Old relation not deleted problem occurred");
+
+
+    }
+
+    public int UpdateNodeParentFormat (Node new_node, String new_parent_nodeId)
+    {
+        boolean update_scientific_name = false;
+        boolean update_rank = false;
+        int update_hierarchy = 0;
+        int nodegeneratedId = getAcceptedNodeIfExist(new_node.getNodeId(), new_node.getScientificName(), new_node.getResourceId());
+        if (nodegeneratedId == -1)
         {
-            Node old_node = getNodeProperties(nodegeneratedId);
-            if (!old_node.getScientificName().equals(new_node.getScientificName()))
+            nodegeneratedId = getNodeIfExist(new_node.getNodeId(), new_node.getResourceId());
+            if (nodegeneratedId != -1)
             {
-                logger.debug("Update scientific Name of the node");
-                UpdateScientificName(nodegeneratedId, new_node.getScientificName());
+                Node old_node = getNodeProperties(nodegeneratedId);
+                if (!old_node.getScientificName().equals(new_node.getScientificName()))
+                {
+                     logger.debug("Update scientific name of the node");
+                     update_scientific_name = UpdateScientificName(nodegeneratedId, new_node.getScientificName());
+
+
+                }
+
             }
-            if (!old_node.getRank().equals(old_node.getRank()))
+        }
+
+        nodegeneratedId = getNodeIfExist(new_node.getNodeId(), new_node.getResourceId());
+        Node old_node = getNodeProperties(nodegeneratedId);
+            if (!old_node.getRank().equals(new_node.getRank()))
             {
                 logger.debug("Update rank of the node");
-                UpdateRank(nodegeneratedId, new_node.getRank());
+                update_rank = UpdateRank(nodegeneratedId, new_node.getRank());
+
             }
+
+        if (update_scientific_name || update_rank)
+            {
+                new_node.setGeneratedNodeId(nodegeneratedId);
+                update_hierarchy = UpdateHierarchy(new_node, new_parent_nodeId);
+                if (update_hierarchy != 0)
+                {
+                    logger.debug("Update ancestry done as well as scientific or rank");
+                    return update_hierarchy;
+                }
+                    logger.debug("Only scientific or rank update");
+                    return 1;
+            }
+
             else
             {
-                logger.debug("Update ancestry in parent format");
-                int result = UpdateHierarchy(new_node, new_parent);
-                if (result == 200)
+                new_node.setGeneratedNodeId(nodegeneratedId);
+                update_hierarchy = UpdateHierarchy(new_node, new_parent_nodeId);
+                if (update_hierarchy != 0)
                 {
-                   return true;
+                    logger.debug("Update ancestry done");
+                    return update_hierarchy;
                 }
-                if (result == 400)
-                {
-                   return false;
-                }
-                return false;
+                logger.debug("Update failed");
+                return 0;
             }
 
-        }
-        else
-        {
-            return false;
-        }
-        return true;
-        // update and check return valuse and test
+//        int nodegeneratedId = getNodeIfExist(new_node.getNodeId(), new_node.getResourceId());
+//        new_node.setGeneratedNodeId(nodegeneratedId);
+//        boolean update_scientific_name = false;
+//        boolean update_rank = false;
+//        int update_hierarchy = 0;
+//        if (nodegeneratedId != -1)
+//        {
+//            Node old_node = getNodeProperties(nodegeneratedId);
+//            if (!old_node.getScientificName().equals(new_node.getScientificName()))
+//            {
+//                logger.debug("Update scientific name of the node");
+//                update_scientific_name = UpdateScientificName(nodegeneratedId, new_node.getScientificName());
+//
+//            }
+//            if (!old_node.getRank().equals(new_node.getRank()))
+//            {
+//                logger.debug("Update rank of the node");
+//                update_rank = UpdateRank(nodegeneratedId, new_node.getRank());
+//
+//            }
+//
+//            if (update_scientific_name || update_rank)
+//            {
+//                update_hierarchy = UpdateHierarchy(new_node, new_parent_nodeId);
+//                if (update_hierarchy != 0)
+//                {
+//                    logger.debug("Update ancestry done as well as scientific");
+//                    return update_hierarchy;
+//                }
+//                    logger.debug("Only scientific or rank update");
+//                    return 1;
+//            }
+//
+//            else
+//            {
+//                update_hierarchy = UpdateHierarchy(new_node, new_parent_nodeId);
+//                if (update_hierarchy != 0)
+//                {
+//                    logger.debug("Update ancestry done");
+//                    return update_hierarchy;
+//                }
+//                logger.debug("Update failed");
+//                return 0;
+//            }
+//
+//        }
+//
+//        logger.debug("Update ancestry in parent format");
+//        return UpdateHierarchy(new_node, new_parent_nodeId);
+//
+
     }
 
-    public int UpdateHierarchy(Node new_node, Node new_parent)
+    public int UpdateHierarchy(Node new_node, String new_parent_nodeId)
     {
+
         int old_parent_id = getParent(new_node.getGeneratedNodeId());
+        int new_parent_id = getNodeIfExist(new_parent_nodeId,new_node.getResourceId());
         Node old_parent = getNodeProperties(old_parent_id);
+        //TODO: this function below gets 1 but the node exists
         int new_nodeGeneratedId = getNodeGivenParentIfExists(new_node.getResourceId(), new_node.getScientificName(),
-                new_node.getRank(), new_node.getNodeId(), new_parent.getGeneratedNodeId());
+                new_node.getRank(), new_node.getNodeId(), new_parent_id);
         if (new_nodeGeneratedId == -1)
         {
             logger.debug("Node with this new parent is not found");
             new_nodeGeneratedId = createAcceptedNode(new_node.getResourceId(), new_node.getNodeId(), new_node.getScientificName(),
                     new_node.getRank(), -1);
-            boolean new_parent_exists = checkIfNodeExists(new_parent.getGeneratedNodeId());
+            boolean new_parent_exists = checkIfNodeExists(new_parent_id);
             if(new_parent_exists)
             {
                 logger.debug("New Parent exists as a node");
-                createChildParentRelation(new_parent.getGeneratedNodeId(), new_nodeGeneratedId);
+                createChildParentRelation(new_parent_id, new_nodeGeneratedId);
+                deleteOldParentRelation(new_nodeGeneratedId, old_parent_id);
                 if (!parenthasNodeId(old_parent_id))
                 {
                     logger.debug("Old parent is placeholder");
@@ -159,6 +252,11 @@ public class Neo4jParentFormat extends Neo4jCommon  {
             }
 
 
+        }
+        else
+        {
+            logger.debug("There is no update ancestry too");
+            return 0;
         }
 
     }

@@ -1,6 +1,5 @@
 package org.bibalex.eol.neo4j.api;
 
-//import org.bibalex.eol.neo4j.backend_api.Neo4jForest;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.NodeData;
@@ -8,6 +7,7 @@ import org.bibalex.eol.neo4j.parser.Neo4jAncestryFormat;
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
 import org.bibalex.eol.neo4j.models.Node;
 import org.bibalex.eol.neo4j.parser.Neo4jParentFormat;
+import org.bibalex.eol.neo4j.parser.TaxonMatching;
 import org.neo4j.driver.v1.Session;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class NodesService {
     HbaseData hbaseData = new HbaseData();
     NodeData nodeData = new NodeData();
     Neo4jTree forest = new Neo4jTree();
-
+    TaxonMatching TaxonM = new TaxonMatching();
 
     public int createNode(Node n)
     {
@@ -56,15 +56,34 @@ public class NodesService {
        return n.getGeneratedNodeId();
     }
 
-    public boolean deleteNodeAncestoryFormat(Node n)
+    public int createNodewithFulldata(Node n)
     {
-        boolean result  = aNode.deleteNodeAncestoryFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
+        int generatedNodeId = parser.createNodewithFulldata(n.getResourceId(), n.getNodeId(), n.getScientificName(),
+                n.getRank(), n.getParentGeneratedNodeId());
+        return generatedNodeId;
+    }
+
+    public int deleteNodeAncestoryFormat(Node n)
+    {
+        int node_deleted_id  = aNode.deleteNodeAncestoryFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
+        return node_deleted_id;
+    }
+
+    public int deleteNodeParentFormat(Node n)
+    {
+        int node_deleted_id  = pNode.deleteNodeParentFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
+        return node_deleted_id;
+    }
+
+    public int updateNodeParentFormat(Node new_node, String parent)
+    {
+        int result =  pNode.UpdateNodeParentFormat(new_node, parent);
         return result;
     }
 
-    public boolean deleteNodeParentFormat(Node n)
+    public boolean updateNodeAncestoryFormat(ArrayList<Node> nodes)
     {
-        boolean result  = pNode.deleteNodeParentFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
+        boolean result = aNode.UpdateNodeAncestoryFormat(nodes);
         return result;
     }
 
@@ -128,10 +147,34 @@ public class NodesService {
         return ParentNodes;
     }
 
-    public ArrayList<Node> getRoots()
+    public ArrayList<Node> getRoots(int resourceId)
     {
-        ArrayList<Node> roots = parser.getRootNodes();
+        ArrayList<Node> roots = TaxonM.getRootNodes(resourceId);
         return roots;
+    }
+
+    public ArrayList<Node> getAncestors(int generatedNodeId)
+    {
+        ArrayList<Node> ancestors = TaxonM.getAncestorsNodes(generatedNodeId);
+        return ancestors;
+    }
+
+    public ArrayList<Node> getChildren(int generatedNodeId)
+    {
+        ArrayList<Node> children = TaxonM.getChildrenNode(generatedNodeId);
+        return children;
+    }
+
+    public boolean hasChildren(int generatedNodeId)
+    {
+        boolean children = parser.hasChildren(generatedNodeId);
+        return children;
+    }
+
+    public boolean addPageIdtoNode(int generatedNodeId , int pageId)
+    {
+        boolean flag = TaxonM.addPageIdtoNode(generatedNodeId,pageId);
+        return flag;
     }
 
 }
