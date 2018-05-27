@@ -60,7 +60,7 @@ public class TaxonMatching extends Neo4jCommon{
     public boolean addPageIdtoNode(int generatedNodeId , int pageId)
     {   boolean flag = false;
         logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}}) SET n.page_id = {pageId} Return n.page_id";
+        String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) SET n.page_id = {pageId} Return n.page_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId));
         if(result.hasNext())
         {
