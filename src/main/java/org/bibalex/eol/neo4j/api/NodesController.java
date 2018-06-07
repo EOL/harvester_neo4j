@@ -2,6 +2,7 @@ package org.bibalex.eol.neo4j.api;
 
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.NodeData;
+import org.bibalex.eol.neo4j.parser.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.bibalex.eol.neo4j.models.Node;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/neo4j")
@@ -180,9 +182,32 @@ public class NodesController {
 
         boolean flag =  service.addPageIdtoNode(generatedNodeId,pageId);
         return flag;
-
+        
     }
 
+    @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}", method = RequestMethod.POST, produces = "application/json")
+    public int addPageIdtoNode(@PathVariable("generatedNodeId") int generatedNodeId) {
+        return service.addPageIdtoNode(generatedNodeId);
+    }
 
+    @RequestMapping(value="/getNativeVirusNode", method = RequestMethod.GET, produces = "application/json")
+    public ArrayList<Node> getNativeVirusNode() {
+        return service.getNativeVirusNode();
+    }
 
+    @RequestMapping(value="/setNativeVirusNode/{generatedNodeId}", method = RequestMethod.POST)
+    public boolean setNativeVirusNode(@PathVariable("generatedNodeId") int generatedNodeId) {
+        return service.setNativeVirusNode(generatedNodeId);
+    }
+
+    /**
+     * fetches the nodes data by their ids.
+     * @param genetaredIds the ids of the wanted nodes in json format, i.e "[1,2]" in case of ids=1,2
+     * @return json format of the nodes attributes.
+     */
+    @RequestMapping(value="/getNodes", method = RequestMethod.POST, produces = "application/json")
+    public ArrayList<Node> getNodesByGeneratedIds( @RequestBody ArrayList<String> genetaredIds) {
+        return service.getNodesByAttribute(Constants.NODE_ATTRIBUTE_GENERATEDID, genetaredIds);
+    }
 }
+

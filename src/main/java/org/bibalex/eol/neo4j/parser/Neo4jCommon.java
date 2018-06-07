@@ -11,11 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class Neo4jCommon {
     Session session;
     int autoId = 0;
+    int pageId = 0;
     Logger logger = LoggerFactory.getLogger(Neo4jCommon.class);
 
     public int getAutoId() {
@@ -36,11 +38,27 @@ public class Neo4jCommon {
 
     }
 
+    public int getPageId() {
+        String query = "MATCH (n:" + Constants.HAS_PAGE_LABEL + ") RETURN n.page_id ORDER BY n.page_id DESC LIMIT 1";
+        StatementResult result = getSession().run(query);
+
+        if (result.hasNext()) {
+            Record record = result.next();
+            pageId = record.get("n.page_id").asInt();
+            logger.debug("Page id " + pageId + " is retrieved.");
+            pageId++;
+        } else {
+            logger.debug("First page id.");
+            pageId = 1;
+        }
+        return pageId;
+    }
+
     public Session getSession() {
         if (session == null || !session.isOpen()) {
+//            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "root"));
             Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "eol"));
             session = driver.session();
-
         }
         return session;
     }
@@ -58,6 +76,8 @@ public class Neo4jCommon {
             StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
                     "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId));
             Record record = result.next();
+            System.out.println("parentGeneratedNodeId:" + parentGeneratedNodeId + ", autoId:"+autoId
+                    + ", record.get(\"n.generated_auto_id\").asInt()" + record.get("n.generated_auto_id").asInt());
             if (parentGeneratedNodeId > 0) {
                 logger.debug("Parent available with id " + parentGeneratedNodeId);
                 createChildParentRelation(parentGeneratedNodeId, record.get("n.generated_auto_id").asInt() );
@@ -286,7 +306,7 @@ public class Neo4jCommon {
 
     public boolean hasChildren(int generatedNodeId) {
         logger.debug("Checking if node with generated_auto_id " + generatedNodeId + " has children");
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) RETURN c";
+        String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) RETURN c";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         if (result.hasNext()) {
             logger.debug("Yes node has children");
@@ -354,7 +374,7 @@ public class Neo4jCommon {
         while (result.hasNext())
         {
             Record record = result.next();
-            Value  node_data = record.get("n");
+            Value node_data = record.get("n");
             node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());
             node.setNodeId(node_data.get("node_id").toString());
             node.setResourceId(node_data.get("resource_id").asInt());
@@ -425,4 +445,48 @@ public class Neo4jCommon {
 
     }
 
+    public boolean setNodeLabel(int generatedNodeId, String label) {
+        logger.debug("Add Label "+ label + " to Node with autoId "+ generatedNodeId);
+        String query = "MATCH (n{generated_auto_id : {generatedNodeId}}) SET n:" + label + " return n.generated_auto_id";
+        logger.debug("query: " + query);
+        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
+        if (result.hasNext()) {
+            logger.debug("Label " + label + " is added.");
+            return true;
+        } else {
+            logger.debug("Problem occurred while adding node label.");
+            return false;
+        }
+    }
+
+    public ArrayList<Node> getLabeledNodesByAttribute(String attribute, String label, ArrayList<String> attributeVals) {
+        String valsStr = "";
+        if(Constants.NODE_ATTRIBUTES_STRs.contains(label))
+            valsStr = attributeVals.stream().map(str -> "'" + str + "'").collect(Collectors.joining(","));
+        else
+            valsStr = attributeVals.stream().collect(Collectors.joining(","));
+        logger.info("Get data of nodes attribute: " + attribute + " --vals--> " + valsStr);
+        Node node;
+        ArrayList<Node> nodes = new ArrayList<Node>();
+        String query = "MATCH (n" + ((label.length() > 0)? ":" + label:"") + ")" + ((attributeVals.size() > 0)?
+                (" where n." + attribute + " in [" + valsStr + "]") : "" ) + "return n";
+        logger.debug("Neo4jCommon.getNodesByAttribute.query:" + query);
+        StatementResult result = getSession().run(query);
+        while (result.hasNext()) {
+            Record record = result.next();
+            node = new Node();
+            Value node_data = record.get("n");
+            node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());
+            node.setNodeId(node_data.get("node_id").toString());
+            node.setResourceId(node_data.get("resource_id").asInt());
+            node.setRank(node_data.get("rank").asString());
+            node.setScientificName(node_data.get("scientific_name").asString());
+            if(node_data.get("page_id") != null)
+                node.setPageId(node_data.get("page_id").asInt());
+            nodes.add(node);
+        }
+        return nodes;
+    }
+
 }
+

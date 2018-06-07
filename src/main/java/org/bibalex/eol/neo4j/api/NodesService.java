@@ -3,16 +3,18 @@ package org.bibalex.eol.neo4j.api;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.NodeData;
-import org.bibalex.eol.neo4j.parser.Neo4jAncestryFormat;
-import org.bibalex.eol.neo4j.parser.Neo4jCommon;
+import org.bibalex.eol.neo4j.parser.*;
 import org.bibalex.eol.neo4j.models.Node;
 import org.bibalex.eol.neo4j.parser.Neo4jParentFormat;
 import org.bibalex.eol.neo4j.parser.TaxonMatching;
 import org.neo4j.driver.v1.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class NodesService {
@@ -23,6 +25,7 @@ public class NodesService {
     NodeData nodeData = new NodeData();
     Neo4jTree forest = new Neo4jTree();
     TaxonMatching TaxonM = new TaxonMatching();
+    Logger logger = LoggerFactory.getLogger(Neo4jCommon.class);
 
     public int createNode(Node n)
     {
@@ -177,4 +180,28 @@ public class NodesService {
         return flag;
     }
 
+    public int addPageIdtoNode(int generatedNodeId) {
+        int pageId = parser.getPageId();
+        if(TaxonM.addPageIdtoNode(generatedNodeId, pageId))
+            return pageId;
+        else
+            return -1;
+    }
+
+//    public Node getNativeVirusNode() {
+//        return parser.getNodeProperties(-1, true);
+//    }
+
+    public ArrayList<Node> getNativeVirusNode() {
+        return parser.getLabeledNodesByAttribute("", Constants.VIRUS_LABEL, new ArrayList<String>());
+    }
+
+    public boolean setNativeVirusNode(int generatedNodeId) {
+        return TaxonM.setNodeLabel(generatedNodeId, Constants.VIRUS_LABEL);
+    }
+
+    public ArrayList<Node> getNodesByAttribute(String attribute, ArrayList<String> ids) {
+        return parser.getLabeledNodesByAttribute(attribute, "", ids);
+    }
 }
+
