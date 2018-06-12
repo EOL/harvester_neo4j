@@ -2,11 +2,11 @@ package org.bibalex.eol.neo4j.api;
 
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
+import org.bibalex.eol.neo4j.indexer.Neo4jIndexer;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.bibalex.eol.neo4j.parser.*;
 import org.bibalex.eol.neo4j.models.Node;
-import org.bibalex.eol.neo4j.parser.Neo4jParentFormat;
-import org.bibalex.eol.neo4j.parser.TaxonMatching;
+import org.json.simple.JSONObject;
 import org.neo4j.driver.v1.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +18,7 @@ import java.util.List;
 
 @Service
 public class NodesService {
+    Neo4jIndexer indexer = new Neo4jIndexer();
     Neo4jCommon parser = new Neo4jCommon();
     Neo4jParentFormat pNode = new Neo4jParentFormat();
     Neo4jAncestryFormat aNode = new Neo4jAncestryFormat();
@@ -132,6 +133,11 @@ public class NodesService {
          return trees;
     }
 
+    public ArrayList<JSONObject> getJson(int[] generatedNodeIds) {
+        ArrayList<JSONObject> nodes = indexer.Neo4jToJson(generatedNodeIds);
+        return nodes;
+
+    }
 
     public ArrayList<Neo4jTree> getResourceTrees(int resourceId)
     {
@@ -187,10 +193,6 @@ public class NodesService {
         else
             return -1;
     }
-
-//    public Node getNativeVirusNode() {
-//        return parser.getNodeProperties(-1, true);
-//    }
 
     public ArrayList<Node> getNativeVirusNode() {
         return parser.getLabeledNodesByAttribute("", Constants.VIRUS_LABEL, new ArrayList<String>());

@@ -3,6 +3,7 @@ package org.bibalex.eol.neo4j.parser;
 import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.driver.v1.*;
 
+import static org.neo4j.driver.v1.Values.NULL;
 import static org.neo4j.driver.v1.Values.parameters;
 
 
@@ -56,8 +57,8 @@ public class Neo4jCommon {
 
     public Session getSession() {
         if (session == null || !session.isOpen()) {
-//            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "root"));
-            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "eol"));
+            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "root"));
+//            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "eol"));
             session = driver.session();
         }
         return session;
@@ -481,7 +482,7 @@ public class Neo4jCommon {
             node.setResourceId(node_data.get("resource_id").asInt());
             node.setRank(node_data.get("rank").asString());
             node.setScientificName(node_data.get("scientific_name").asString());
-            if(node_data.get("page_id") != null)
+            if(node_data.get("page_id") != NULL)
                 node.setPageId(node_data.get("page_id").asInt());
             nodes.add(node);
         }

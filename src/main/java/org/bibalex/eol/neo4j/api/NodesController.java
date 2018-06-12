@@ -3,6 +3,8 @@ package org.bibalex.eol.neo4j.api;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.bibalex.eol.neo4j.parser.Constants;
+import org.json.simple.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.bibalex.eol.neo4j.models.Node;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -134,11 +136,15 @@ public class NodesController {
     }
 
     @RequestMapping(value="/getResourceTrees/{resourceId}", method = RequestMethod.GET)
-    public ArrayList<Neo4jTree> getResourceTrees(@PathVariable("resourceId") int resourceId)
-    {
+    public ArrayList<Neo4jTree> getResourceTrees(@PathVariable("resourceId") int resourceId) {
         ArrayList<Neo4jTree> trees = service.getResourceTrees(resourceId);
         return trees;
+    }
 
+    @RequestMapping(value="/getNodesJson", method = RequestMethod.POST , consumes = "application/json", produces = "application/json")
+    public ArrayList<JSONObject> getNodesJson(@RequestBody int[] generatedNodeIds) throws IOException {
+        ArrayList<JSONObject> nodes = service.getJson(generatedNodeIds);
+        return nodes;
     }
 
     @RequestMapping(value="/getParentsOfNodes", method = RequestMethod.GET, consumes = "application/json", produces = "application/json")
@@ -206,7 +212,7 @@ public class NodesController {
      * @return json format of the nodes attributes.
      */
     @RequestMapping(value="/getNodes", method = RequestMethod.POST, produces = "application/json")
-    public ArrayList<Node> getNodesByGeneratedIds( @RequestBody ArrayList<String> genetaredIds) {
+    public ArrayList<Node> getNodesByGeneratedIds(@RequestBody ArrayList<String> genetaredIds) {
         return service.getNodesByAttribute(Constants.NODE_ATTRIBUTE_GENERATEDID, genetaredIds);
     }
 }
