@@ -191,7 +191,7 @@ public class NodesController {
         
     }
 
-    @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
     public int addPageIdtoNode(@PathVariable("generatedNodeId") int generatedNodeId) {
         return service.addPageIdtoNode(generatedNodeId);
     }
@@ -214,6 +214,13 @@ public class NodesController {
     @RequestMapping(value="/getNodes", method = RequestMethod.POST, produces = "application/json")
     public ArrayList<Node> getNodesByGeneratedIds(@RequestBody ArrayList<String> genetaredIds) {
         return service.getNodesByAttribute(Constants.NODE_ATTRIBUTE_GENERATEDID, genetaredIds);
+    }
+
+    @RequestMapping(value="/getSynonyms/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
+    public ArrayList<Node> getSynonyms(@PathVariable("generatedNodeId") int generatedNodeId)
+    {
+        ArrayList<Node> synonyms = service.getSynonyms(generatedNodeId);
+        return synonyms;
     }
 }
 

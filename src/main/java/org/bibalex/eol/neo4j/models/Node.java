@@ -17,6 +17,7 @@ public class Node implements Serializable{
     int pageId;
     long created_at;
     long updated_at;
+    String canonicalName;
 
     public String getNodeId()
     {
@@ -132,5 +133,13 @@ public class Node implements Serializable{
     public void setPageId(int pageId){this.pageId = pageId;}
 
     public int getPageId(){return pageId;}
+
+    public String getCanonicalName() {
+        return canonicalName;
+    }
+
+    public void setCanonicalName(String canonicalName) {
+        this.canonicalName = canonicalName;
+    }
 }
 

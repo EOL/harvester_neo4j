@@ -205,5 +205,11 @@ public class NodesService {
     public ArrayList<Node> getNodesByAttribute(String attribute, ArrayList<String> ids) {
         return parser.getLabeledNodesByAttribute(attribute, "", ids);
     }
+
+    public ArrayList<Node> getSynonyms(int generatedNodeId)
+    {
+        ArrayList<Node> synonyms = TaxonM.getSynonyms(generatedNodeId);
+        return synonyms;
+    }
 }
 

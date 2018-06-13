@@ -72,6 +72,22 @@ public class TaxonMatching extends Neo4jCommon{
         return flag;
     }
 
+    public ArrayList<Node> getSynonyms(int generatedNodeId)
+    {
+        logger.info("Getting synonyms of node with autoId" + generatedNodeId);
+        ArrayList<Node> synonyms = new ArrayList<>();
+        String query = "MATCH (a {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s";
+        StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
+        while (result.hasNext())
+        {
+
+            Record record = result.next();
+            Node node = setNode(record.get("s"));
+            synonyms.add(node);
+        }
+        return synonyms;
+    }
+
     public Node setNode(Value node_data)
     {   Node node=new Node();
         if( node_data.get("generated_auto_id")!= NULL ){node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());}
@@ -86,6 +102,7 @@ public class TaxonMatching extends Neo4jCommon{
         if(node_data.get("parent_node_id")!= NULL){node.setParentNodeId(node_data.get("parent_node_id").asString());}
         if(node_data.get("updated_at")!= NULL){node.setUpdated_at(node_data.get("updated_at").asLong());}
         if(node_data.get("created_at")!= NULL){node.setCreated_at(node_data.get("created_at").asLong());}
+        if(node_data.get("canonical_name")!= NULL){node.setCanonicalName(node_data.get("canonical_name").asString());}
 
         return node;
     }
