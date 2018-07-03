@@ -66,7 +66,7 @@ public class Neo4jCommon {
 
     public int createAcceptedNode(int resourceId, String nodeId, String scientificName, String rank,
                                   int parentGeneratedNodeId, int pageId) {
-        System.out.println("--------------" + pageId);
+
         int nodeGeneratedNodeId = getAcceptedNodeIfExist( nodeId, scientificName, resourceId);
         if (nodeGeneratedNodeId == -1)
         {
@@ -386,9 +386,9 @@ public class Neo4jCommon {
             node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());
             node.setNodeId(node_data.get("node_id").toString());
             node.setResourceId(node_data.get("resource_id").asInt());
+            if(node_data.get("page_id") != NULL) node.setPageId(node_data.get("page_id").asInt());
             node.setRank(node_data.get("rank").asString());
             node.setScientificName(node_data.get("scientific_name").asString());
-
         }
         return node;
     }
@@ -477,7 +477,10 @@ public class Neo4jCommon {
         Node node;
         ArrayList<Node> nodes = new ArrayList<Node>();
         String query = "MATCH (n" + ((label.length() > 0)? ":" + label:"") + ")" + ((attributeVals.size() > 0)?
-                (" where n." + attribute + " in [" + valsStr + "]") : "" ) + "return n";
+                ((attributeVals.size() == 1)? (" where n." + attribute + " = " + valsStr + " ") :
+                        (" where n." + attribute + " in [" + valsStr + "]")
+                ) : "" )
+                + "return n";
         logger.debug("Neo4jCommon.getNodesByAttribute.query:" + query);
         StatementResult result = getSession().run(query);
         while (result.hasNext()) {

@@ -196,6 +196,11 @@ public class NodesController {
         return service.addPageIdtoNode(generatedNodeId);
     }
 
+    @RequestMapping(value="/getNodePageId/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
+    public int getNodePageId(@PathVariable("generatedNodeId") int generatedNodeId) {
+        return service.getNodePageId(generatedNodeId);
+    }
+
     @RequestMapping(value="/getNativeVirusNode", method = RequestMethod.GET, produces = "application/json")
     public ArrayList<Node> getNativeVirusNode() {
         return service.getNativeVirusNode();

@@ -14,7 +14,7 @@ public class Node implements Serializable{
     String parentNodeId;
     String acceptedNodeId;
     int acceptedNodeGeneratedId;
-    int pageId = 0;
+    int pageId;
     long created_at;
     long updated_at;
     String canonicalName;

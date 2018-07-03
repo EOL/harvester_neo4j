@@ -211,5 +211,12 @@ public class NodesService {
         ArrayList<Node> synonyms = TaxonM.getSynonyms(generatedNodeId);
         return synonyms;
     }
+
+    public int getNodePageId(int generatedNodeId) {
+        ArrayList<String> vals = new ArrayList<String>();
+        vals.add(generatedNodeId + "");
+        ArrayList<Node> nodes = parser.getLabeledNodesByAttribute(Constants.NODE_ATTRIBUTE_GENERATEDID, Constants.HAS_PAGE_LABEL, vals);
+        return (nodes.size() > 0)? nodes.get(0).getPageId() : 0;
+    }
 }
 
