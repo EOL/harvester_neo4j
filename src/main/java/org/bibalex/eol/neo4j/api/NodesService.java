@@ -31,7 +31,7 @@ public class NodesService {
     public int createNode(Node n)
     {
        int generatedNodeId =  parser.createAcceptedNode(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
-                     n.getParentGeneratedNodeId());
+                     n.getParentGeneratedNodeId(), n.getPageId());
        n.setGeneratedNodeId(generatedNodeId);
        return n.getGeneratedNodeId();
     }
@@ -55,7 +55,7 @@ public class NodesService {
     public int createAncestorNode(Node n)
     {
        int generatedNodeId =  aNode.createAncestorIfNotExist(n.getResourceId(), n.getScientificName(),
-               n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId());
+               n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId(), n.getPageId());
        n.setGeneratedNodeId(generatedNodeId);
        return n.getGeneratedNodeId();
     }
@@ -63,7 +63,7 @@ public class NodesService {
     public int createNodewithFulldata(Node n)
     {
         int generatedNodeId = parser.createNodewithFulldata(n.getResourceId(), n.getNodeId(), n.getScientificName(),
-                n.getRank(), n.getParentGeneratedNodeId());
+                n.getRank(), n.getParentGeneratedNodeId(), n.getPageId());
         return generatedNodeId;
     }
 

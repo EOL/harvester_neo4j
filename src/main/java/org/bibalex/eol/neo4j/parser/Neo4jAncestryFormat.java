@@ -6,6 +6,7 @@ import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.csv.reader.Mark;
 import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.graphdb.Transaction;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import static org.neo4j.driver.v1.Values.parameters;
 public class Neo4jAncestryFormat extends Neo4jCommon {
 
     public int createAncestorIfNotExist(int resourceId, String scientificName, String rank, String nodeId,
-                                        int parentGeneratedNodeId)
+                                        int parentGeneratedNodeId, int pageId)
     {
 
         int nodeGeneratedNodeId = getAncestoryFormatNodeIfExist(resourceId, scientificName, parentGeneratedNodeId);
@@ -26,11 +27,18 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         {
             logger.debug("Node "+ scientificName +" not found creating a new node");
             autoId = getAutoId();
-            String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {nodeId}," +
-                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, created_at: apoc.date.currentTimestamp(), " +
-                    "updated_at: apoc.date.currentTimestamp()})RETURN n.generated_auto_id";
-            StatementResult result = getSession().run(create_query, parameters( "resourceId", resourceId,
-                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId ));
+            String hasPage = (pageId > 0)? (":" + Constants.HAS_PAGE_LABEL) : "";
+            String create_query = "CREATE (n:Node" + hasPage + " {resource_id: {resourceId}, node_id: {nodeId}," +
+                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, " +
+                    ((pageId > 0)? ("page_id:{pageId},") : "") + "created_at: timestamp(), " +
+                    "updated_at: timestamp()})RETURN n.generated_auto_id";
+
+            Value values;
+            values = (pageId > 0)? parameters( "resourceId", resourceId,
+                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId, "pageId", pageId) :
+                    parameters( "resourceId", resourceId,
+                            "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId);
+            StatementResult result = getSession().run(create_query, values);
             if (parentGeneratedNodeId > 0) {
                 logger.debug("Parent available with id " + parentGeneratedNodeId);
                 createChildParentRelation(parentGeneratedNodeId, autoId);
@@ -177,7 +185,7 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
             parent_node = nodes.get(updated_node_index-1);
             logger.debug("Create subtree from updated node till the end");
             nodegeneratedId = createAncestorIfNotExist(updated_node.getResourceId(), updated_node.getScientificName(), updated_node.getRank(),
-                    updated_node.getNodeId(), -1);
+                    updated_node.getNodeId(), -1, updated_node.getPageId());
             updated_node.setGeneratedNodeId(nodegeneratedId);
             Node node = new Node();
             for(int i = updated_node_index+1; i < nodes.size(); i++)
@@ -185,7 +193,7 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
                 logger.debug("Create subtree from updated node till the end");
                 node = nodes.get(i);
                 nodegeneratedId = createAncestorIfNotExist(node.getResourceId(), node.getScientificName(), node.getRank(),
-                        node.getNodeId(), nodegeneratedId);
+                        node.getNodeId(), nodegeneratedId, node.getPageId());
             }
 
             int old_node_generated_id  = (int)old_branch.get(old_branch.size()-1);

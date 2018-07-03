@@ -16,7 +16,7 @@ public class Neo4jParentFormat extends Neo4jCommon  {
             autoId = getAutoId();
             String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {parentUsageId}," +
                     " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
-                    " created_at: apoc.date.currentTimestamp(),updated_at: apoc.date.currentTimestamp()})" +
+                    " created_at: timestamp(),updated_at: timestamp()})" +
                     "RETURN n.generated_auto_id";
             StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
                     "parentUsageId", parentUsageId, "scientificName", "placeholder", "rank", "placeholder", "autoId", autoId));
@@ -231,7 +231,7 @@ public class Neo4jParentFormat extends Neo4jCommon  {
         {
             logger.debug("Node with this new parent is not found");
             new_nodeGeneratedId = createAcceptedNode(new_node.getResourceId(), new_node.getNodeId(), new_node.getScientificName(),
-                    new_node.getRank(), -1);
+                    new_node.getRank(), -1, new_node.getPageId());
             boolean new_parent_exists = checkIfNodeExists(new_parent_id);
             if(new_parent_exists)
             {

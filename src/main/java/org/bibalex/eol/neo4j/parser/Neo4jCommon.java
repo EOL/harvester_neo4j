@@ -57,28 +57,35 @@ public class Neo4jCommon {
 
     public Session getSession() {
         if (session == null || !session.isOpen()) {
-//            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "root"));
-            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "eol"));
+            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "root"));
+//            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "eol"));
             session = driver.session();
         }
         return session;
     }
 
     public int createAcceptedNode(int resourceId, String nodeId, String scientificName, String rank,
-                                  int parentGeneratedNodeId) {
+                                  int parentGeneratedNodeId, int pageId) {
+        System.out.println("--------------" + pageId);
         int nodeGeneratedNodeId = getAcceptedNodeIfExist( nodeId, scientificName, resourceId);
         if (nodeGeneratedNodeId == -1)
         {
             logger.debug("Node "+ scientificName +" not found creating a new node");
             autoId = getAutoId();
-            String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {nodeId}," +
-                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, created_at: apoc.date.currentTimestamp()," +
-                    "updated_at: apoc.date.currentTimestamp()}) RETURN n.generated_auto_id";
-            StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
-                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId));
+            String hasPage = (pageId > 0)? (":" + Constants.HAS_PAGE_LABEL) : "";
+            String create_query = "CREATE (n:Node" + hasPage + " {resource_id: {resourceId}, node_id: {nodeId}," +
+                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, " +
+                    ((pageId > 0)? ("page_id:{pageId},") : "") + "created_at: timestamp()," +
+                    "updated_at: timestamp()}) RETURN n.generated_auto_id";
+
+            Value values;
+            values = (pageId > 0)? parameters("resourceId", resourceId,
+                        "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId, "pageId", pageId) :  parameters("resourceId", resourceId,
+                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId);
+
+            StatementResult result = getSession().run(create_query, values);
             Record record = result.next();
-            System.out.println("parentGeneratedNodeId:" + parentGeneratedNodeId + ", autoId:"+autoId
-                    + ", record.get(\"n.generated_auto_id\").asInt()" + record.get("n.generated_auto_id").asInt());
+
             if (parentGeneratedNodeId > 0) {
                 logger.debug("Parent available with id " + parentGeneratedNodeId);
                 createChildParentRelation(parentGeneratedNodeId, record.get("n.generated_auto_id").asInt() );
@@ -107,7 +114,7 @@ public class Neo4jCommon {
     }
 
     public int createNodewithFulldata(int resourceId, String nodeId, String scientificName, String rank,
-                                      int parentGeneratedNodeId)
+                                      int parentGeneratedNodeId, int pageId)
     {
         int nodeGeneratedId = getNodeIfExist(nodeId, resourceId);
         if(nodeGeneratedId != -1)
@@ -119,7 +126,7 @@ public class Neo4jCommon {
         }
         else
         {
-            nodeGeneratedId = createAcceptedNode(resourceId, nodeId, scientificName, rank, parentGeneratedNodeId);
+            nodeGeneratedId = createAcceptedNode(resourceId, nodeId, scientificName, rank, parentGeneratedNodeId, pageId);
             logger.debug("Node is not found so created");
         }
         return nodeGeneratedId;
@@ -152,7 +159,7 @@ public class Neo4jCommon {
             autoId = getAutoId();
             String create_query = "CREATE (s:Synonym {resource_id: {resourceId}, node_id: {nodeId}," +
                     "scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
-                    " created_at: apoc.date.currentTimestamp(), updated_at: apoc.date.currentTimestamp()}) RETURN s.generated_auto_id";
+                    " created_at: timestamp(), updated_at: timestamp()}) RETURN s.generated_auto_id";
             StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
                     "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId));
             Record record = result.next();
@@ -391,7 +398,7 @@ public class Neo4jCommon {
     {
         logger.debug("Update Scientific Name of  node with generatedNodeId " + generatedNodeId);
         String query = "MATCH(n {generated_auto_id : {generatedNodeId}}) SET n.scientific_name = {ScientificName}," +
-                " n.updated_at =  apoc.date.currentTimestamp() RETURN n.generated_auto_id";
+                " n.updated_at =  timestamp() RETURN n.generated_auto_id";
         StatementResult result =  getSession().run(query, parameters("generatedNodeId", generatedNodeId,
                 "ScientificName", ScientificName));
         if (result.hasNext())
@@ -408,7 +415,7 @@ public class Neo4jCommon {
     {
         logger.debug("Update rank of  node with generatedNodeId " + generatedNodeId);
         String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) SET n.rank = {rank}, " +
-                "n.updated_at = apoc.date.currentTimestamp()RETURN n.generated_auto_id";
+                "n.updated_at = timestamp()RETURN n.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId,
                 "rank", rank));
         if (result.hasNext())
