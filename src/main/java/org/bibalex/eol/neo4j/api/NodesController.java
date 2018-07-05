@@ -227,5 +227,10 @@ public class NodesController {
         ArrayList<Node> synonyms = service.getSynonyms(generatedNodeId);
         return synonyms;
     }
+
+    @RequestMapping(value="/getAncestors", method = RequestMethod.POST, produces = "application/json")
+    public List<HashMap<Integer, Integer>> getNodeAncestors(@RequestBody List<Integer> generatedNodesIds) {
+        return service.getNodeAncestors(generatedNodesIds);
+    }
 }
 

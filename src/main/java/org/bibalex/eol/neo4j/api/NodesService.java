@@ -218,5 +218,9 @@ public class NodesService {
         ArrayList<Node> nodes = parser.getLabeledNodesByAttribute(Constants.NODE_ATTRIBUTE_GENERATEDID, Constants.HAS_PAGE_LABEL, vals);
         return (nodes.size() > 0)? nodes.get(0).getPageId() : 0;
     }
+
+    public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
+        return parser.getNodeAncestors(generatedNodesIds);
+    }
 }
 
