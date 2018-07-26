@@ -83,7 +83,7 @@ public class Neo4jCommon {
             logger.debug("Create Node query:" + create_query);
             Value values;
             values = (pageId > 0)? parameters("resourceId", resourceId,
-                        "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId, "pageId", pageId) :  parameters("resourceId", resourceId,
+                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId, "pageId", pageId) :  parameters("resourceId", resourceId,
                     "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId);
 
             logger.debug("Values: " + values.size());
@@ -318,7 +318,7 @@ public class Neo4jCommon {
         }
 
         else
-          return false;
+            return false;
     }
 
     public boolean hasChildren(int generatedNodeId) {
@@ -347,7 +347,7 @@ public class Neo4jCommon {
         {
             int parentGeneratedNodeId = getParentAndDelete(generatedNodeId);
             logger.debug("Node has no siblings");
-            if(parentGeneratedNodeId != -1 && !parenthasNodeId(parentGeneratedNodeId))
+            if(parentGeneratedNodeId != -1 && !parentHasAttribute(parentGeneratedNodeId, Constants.NODE_ATTRIBUTE_NODEID))
             {
                 //TODO: check this with the case reported by Mirona
                 logger.debug("Parent is placeholder node");
@@ -364,18 +364,18 @@ public class Neo4jCommon {
         return generatedNodeId;
     }
 
-    public boolean parenthasNodeId(int generatedNodeId) {
-        logger.debug("Check the nodeId of the node with autoId " + generatedNodeId);
-        String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) RETURN n.node_id";
+    public boolean parentHasAttribute(int generatedNodeId, String attr) {
+        logger.debug("Check the " + attr + " of the node with autoId " + generatedNodeId);
+        String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) RETURN n." + attr;
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         Record record = result.next();
-        String nodeId = record.get("n.node_id").toString().replace("\"", "");
-        if (nodeId.equals("placeholder")) {
-            logger.debug("This node has nodeId as placeholder");
+        String attrVal = record.get("n." + attr).toString().replace("\"", "");
+        if (attrVal.equals("placeholder")) {
+            logger.debug("This node has " + attr + " as placeholder");
             return false;
         }
         else {
-            logger.debug("This node has nodeId "+ record.toString());
+            logger.debug("This node has " + attr + " " + record.toString());
             return true;
         }
 
@@ -411,7 +411,7 @@ public class Neo4jCommon {
         StatementResult result =  getSession().run(query, parameters("generatedNodeId", generatedNodeId,
                 "ScientificName", ScientificName));
         if (result.hasNext())
-         return true;
+            return true;
         else
         {
             logger.debug("Problem occurred while updating scientific name");
@@ -502,9 +502,9 @@ public class Neo4jCommon {
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
         List<HashMap<Integer, Integer>> nodes = new ArrayList<HashMap<Integer, Integer>>();
         for(Integer gNodeId : generatedNodesIds) {
-            HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
             String query = " MATCH len = (p)-[:IS_PARENT_OF*0..]->(n:Node {generated_auto_id: {generatedNodeId}}) " +
                     "return length(len) AS len, p.generated_auto_id as id";
+            HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
             StatementResult result = getSession().run(query, parameters("generatedNodeId",
                     gNodeId));
             while (result.hasNext()) {
@@ -513,27 +513,28 @@ public class Neo4jCommon {
                 nodeList.put(record.get("len").asInt(), record.get("id").asInt());
             }
             nodes.add(nodeList);
-
+        }
 
 //            String query = " MATCH len = (p)-[:IS_PARENT_OF*0..]->(n:Node) where n.generated_auto_id in [ " +
 //                    generatedNodesIds.stream().map(x -> x+"").collect(Collectors.joining(",")) +
-//                    "] return collect(length(len)) as l,collect(p) as node, n.generated_auto_id as id";
+//                    "] return collect(length(len)) as l,collect(p.generated_auto_id) as nId, n.generated_auto_id as id";
 //            StatementResult result = getSession().run(query);
 //            while (result.hasNext()) {
-//                logger.debug("Node:" + gNodeId);
 //                Record record = result.next();
 //                Node node = new Node();
 //                Value lList = record.get("l");
-//                Value nList = record.get("node");
+//                Value nList = record.get("nId");
 //                Value id = record.get("id");
+//                logger.debug("->" + id.asInt());
+//                HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
 //
 //                for(int i = 0; i < lList.size(); i++){
-//
-//                    nodeList.put(lList.get(i).asInt(), getNode(nList.get(i)));
+//                    logger.debug("------------> " + lList.get(i).asInt() + ":" + nList.get(i).asInt());
+//                    nodeList.put(lList.get(i).asInt(), nList.get(i).asInt());
 //                }
 //                nodes.add(nodeList);
 //            }
-        }
+
         return nodes;
     }
 
@@ -548,5 +549,37 @@ public class Neo4jCommon {
             node.setPageId(node_data.get("page_id").asInt());
         return node;
     }
-}
 
+    public int updateAcceptedNode(int resourceId, String nodeId, int parentGeneratedNodeId, String sciName) {
+
+        int nodeGeneratedNodeId = getAcceptedNodeIfExist(nodeId, Constants.PLACE_HOLDER, resourceId);
+        if (nodeGeneratedNodeId == -1)
+        {
+            logger.error("Node "+ nodeId +" not found.");
+            return -1;
+        }
+        else
+        {
+            // update node, set scientific name
+            boolean updated = UpdateScientificName(nodeGeneratedNodeId, sciName);
+            if(updated) {
+                logger.debug("Node " + nodeId + " found");
+                logger.debug("parentGeneratedNodeId: " + parentGeneratedNodeId);
+                if (parentGeneratedNodeId > 0) {
+                    logger.debug("Parent available with id " + parentGeneratedNodeId);
+                    logger.debug("record.get(\"n.generated_auto_id\"):" + nodeGeneratedNodeId);
+                    createChildParentRelation(parentGeneratedNodeId, nodeGeneratedNodeId);
+                }
+                if (parentGeneratedNodeId == 0) {
+                    logger.debug("Node is a root node");
+                    String create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
+                    StatementResult result = getSession().run(create_query, parameters("autoId", autoId));
+                }
+            } else {
+                logger.error("Can't update Accepted node scientific name ..");
+            }
+            return nodeGeneratedNodeId;
+        }
+    }
+
+}

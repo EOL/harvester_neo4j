@@ -30,34 +30,34 @@ public class NodesService {
 
     public int createNode(Node n)
     {
-       int generatedNodeId =  parser.createAcceptedNode(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
-                     n.getParentGeneratedNodeId(), n.getPageId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  parser.createAcceptedNode(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
+                n.getParentGeneratedNodeId(), n.getPageId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
-     public int createSynonym(Node n)
+    public int createSynonym(Node n)
     {
-       int generatedNodeId =  parser.createSynonymNode(n.getResourceId(), n.getNodeId(), n.getScientificName(),
-               n.getRank(), n.getAcceptedNodeId(), n.getAcceptedNodeGeneratedId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  parser.createSynonymNode(n.getResourceId(), n.getNodeId(), n.getScientificName(),
+                n.getRank(), n.getAcceptedNodeId(), n.getAcceptedNodeGeneratedId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
 
     public int createParentNode(Node n)
     {
-       int generatedNodeId =  pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
     public int createAncestorNode(Node n)
     {
-       int generatedNodeId =  aNode.createAncestorIfNotExist(n.getResourceId(), n.getScientificName(),
-               n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId(), n.getPageId());
-       n.setGeneratedNodeId(generatedNodeId);
-       return n.getGeneratedNodeId();
+        int generatedNodeId =  aNode.createAncestorIfNotExist(n.getResourceId(), n.getScientificName(),
+                n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId(), n.getPageId());
+        n.setGeneratedNodeId(generatedNodeId);
+        return n.getGeneratedNodeId();
     }
 
     public int createNodewithFulldata(Node n)
@@ -120,17 +120,17 @@ public class NodesService {
 
     public NodeData getData(String generatedNodeId)
     {
-       ArrayList<String> ancestors = hbaseData.getAncestors(Integer.parseInt(generatedNodeId));
-       ArrayList<String> children = hbaseData.getChildren(Integer.parseInt(generatedNodeId));
-       ArrayList<String> synonyms = hbaseData.getSynonyms(Integer.parseInt(generatedNodeId));
-       nodeData.setData(ancestors,children,synonyms);
-       return nodeData;
+        ArrayList<String> ancestors = hbaseData.getAncestors(Integer.parseInt(generatedNodeId));
+        ArrayList<String> children = hbaseData.getChildren(Integer.parseInt(generatedNodeId));
+        ArrayList<String> synonyms = hbaseData.getSynonyms(Integer.parseInt(generatedNodeId));
+        nodeData.setData(ancestors,children,synonyms);
+        return nodeData;
     }
 
     public ArrayList<Neo4jTree> getUpdates(String timestamp)
     {
-         ArrayList<Neo4jTree> trees=forest.getTreeUpdates(timestamp);
-         return trees;
+        ArrayList<Neo4jTree> trees=forest.getTreeUpdates(timestamp);
+        return trees;
     }
 
     public ArrayList<JSONObject> getJson(int[] generatedNodeIds) {
@@ -222,5 +222,11 @@ public class NodesService {
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
         return parser.getNodeAncestors(generatedNodesIds);
     }
-}
 
+    public int updateAcceptedNode(Node n)
+    {
+        int generatedNodeId =  parser.updateAcceptedNode(n.getResourceId(), n.getNodeId(),
+                n.getParentGeneratedNodeId(), n.getScientificName());
+        return generatedNodeId;
+    }
+}

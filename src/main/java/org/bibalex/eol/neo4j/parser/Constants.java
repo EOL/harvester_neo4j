@@ -20,6 +20,8 @@ public class Constants {
     public static final String NODE_ATTRIBUTE_RESOURCEID = "resource_id";
     public static final String NODE_ATTRIBUTE_RANK = "rank";
     public static final String NODE_ATTRIBUTE_PAGEID = "page_id";
+    public static final String PLACE_HOLDER = "placeholder";
+
 
     public static final HashSet<String> NODE_ATTRIBUTES_STRs = new HashSet<String>();
 
