@@ -19,7 +19,7 @@ public class Neo4jParentFormat extends Neo4jCommon  {
                     " created_at: timestamp(),updated_at: timestamp()})" +
                     "RETURN n.generated_auto_id";
             StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
-                    "parentUsageId", parentUsageId, "scientificName", "placeholder", "rank", "placeholder", "autoId", autoId));
+                    "parentUsageId", parentUsageId, "scientificName", Constants.PLACE_HOLDER, "rank", Constants.PLACE_HOLDER, "autoId", autoId));
             if(parentUsageId == "0")
             {
                 logger.debug("Node is a root node");
