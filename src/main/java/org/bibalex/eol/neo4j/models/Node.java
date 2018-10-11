@@ -10,7 +10,7 @@ public class Node implements Serializable{
     String scientificName;
     int generatedNodeId;
     String rank;
-    int parentGeneratedNodeId;
+    int parentGeneratedNodeId = -1;
     String parentNodeId;
     String acceptedNodeId;
     int acceptedNodeGeneratedId;

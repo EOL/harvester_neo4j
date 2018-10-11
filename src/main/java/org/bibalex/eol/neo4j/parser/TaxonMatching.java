@@ -57,19 +57,21 @@ public class TaxonMatching extends Neo4jCommon{
         return roots;
     }
 
-    public boolean addPageIdtoNode(int generatedNodeId, int pageId)
-    {   boolean flag = false;
+    public int addPageIdtoNode(int generatedNodeId, int pageId)
+    {
+        int page_Id = -1;
         logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
-        String query = "MATCH (n {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = {pageId}," +
-                " n.updated_at = timestamp() RETURN n.page_id";
-        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId));
+        String query = "MATCH (c:IdCounter) MATCH (n {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = c.nextPageId," +
+                " n.updated_at = timestamp() SET c.nextPageId = c.nextPageId + 1 RETURN n.page_id";
+        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         if(result.hasNext())
         {
             Record record = result.next();
-            flag = record.get("n.page_id")!= NULL ? true : false;
+            if(record.get("n.page_id")!= NULL)
+                page_Id = record.get("n.page_id").asInt();
 
         }
-        return flag;
+        return page_Id;
     }
 
     public ArrayList<Node> getSynonyms(int generatedNodeId)

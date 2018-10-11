@@ -26,38 +26,38 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         if (nodeGeneratedNodeId == -1)
         {
             logger.debug("Node "+ scientificName +" not found creating a new node");
-            autoId = getAutoId();
+//            autoId = getAutoId();
             String hasPage = (pageId > 0)? (":" + Constants.HAS_PAGE_LABEL) : "";
-            String create_query = "CREATE (n:Node" + hasPage + " {resource_id: {resourceId}, node_id: {nodeId}," +
-                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}, " +
-                    ((pageId > 0)? ("page_id:{pageId},") : "") + "created_at: timestamp(), " +
-                    "updated_at: timestamp()})RETURN n.generated_auto_id";
+            String create_query = " MATCH (c:IdCounter) CREATE (n:Node:GNode" + hasPage + " {resource_id: {resourceId}, node_id: {nodeId}," +
+                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: c.nextId, " +
+                    ((pageId > 0)? ("page_id:c.nextPageId,") : "") + "created_at: timestamp(), " +
+                    "updated_at: timestamp()}) SET c.nextId = c.nextId + 1 " + ((pageId > 0)? (", c.nextPageId = c.nextPageId + 1 ") : "") + " RETURN n.generated_auto_id";
 
             Value values;
             values = (pageId > 0)? parameters( "resourceId", resourceId,
-                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId, "pageId", pageId) :
+                    "nodeId", nodeId, "scientificName", scientificName, "rank", rank) :
                     parameters( "resourceId", resourceId,
-                            "nodeId", nodeId, "scientificName", scientificName, "rank", rank, "autoId", autoId);
+                            "nodeId", nodeId, "scientificName", scientificName, "rank", rank);
             StatementResult result = getSession().run(create_query, values);
-            if (parentGeneratedNodeId > 0) {
-                logger.debug("Parent available with id " + parentGeneratedNodeId);
-                createChildParentRelation(parentGeneratedNodeId, autoId);
-            }
-            if (parentGeneratedNodeId < 0)
-            {
-                logger.debug("This node is created now and parent relation created later on");
-            }
-            if (parentGeneratedNodeId == 0)
-            {
-                logger.debug("Node is a root node");
-                create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
-                result = getSession().run(create_query, parameters("autoId", autoId));
-            }
-            autoId ++;
-            if (result.hasNext()) {
+            Record record = result.next();
+
+            if(record != null) {
+                int genId = record.get("n.generated_auto_id").asInt();
+                if (parentGeneratedNodeId > 0) {
+                    logger.debug("Parent available with id " + parentGeneratedNodeId);
+                    createChildParentRelation(parentGeneratedNodeId, genId);
+                }
+                if (parentGeneratedNodeId < 0) {
+                    logger.debug("This node is created now and parent relation created later on");
+                }
+                if (parentGeneratedNodeId == 0) {
+                    logger.debug("Node is a root node");
+                    create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
+                    result = getSession().run(create_query, parameters("autoId", genId));
+                }
+
                 logger.debug("Node  " + scientificName + " created ");
-                Record record = result.next();
-                return record.get("n.generated_auto_id").asInt();
+                return genId;
             } else {
                 logger.debug("Node  " + scientificName + " is not created a problem has occurred");
                 return -1;

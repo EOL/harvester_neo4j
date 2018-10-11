@@ -4,14 +4,18 @@ import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.indexer.Neo4jIndexer;
 import org.bibalex.eol.neo4j.models.NodeData;
+import org.bibalex.eol.neo4j.models.PropertiesFile;
 import org.bibalex.eol.neo4j.parser.*;
 import org.bibalex.eol.neo4j.models.Node;
 import org.json.simple.JSONObject;
 import org.neo4j.driver.v1.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +31,22 @@ public class NodesService {
     Neo4jTree forest = new Neo4jTree();
     TaxonMatching TaxonM = new TaxonMatching();
     Logger logger = LoggerFactory.getLogger(Neo4jCommon.class);
+    private PropertiesFile app;
+
+
+    @Autowired
+    public void setApp(PropertiesFile app) {
+        this.app = app;
+    }
+
+    @PostConstruct
+    private void init() {
+        parser.createInitNode();
+    }
 
     public int createNode(Node n)
     {
-        int generatedNodeId =  parser.createAcceptedNode(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
+        int generatedNodeId =  parser.createAcceptedNodeUpdated(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
                 n.getParentGeneratedNodeId(), n.getPageId());
         n.setGeneratedNodeId(generatedNodeId);
         return n.getGeneratedNodeId();
@@ -47,9 +63,14 @@ public class NodesService {
 
     public int createParentNode(Node n)
     {
-        int generatedNodeId =  pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
-        n.setGeneratedNodeId(generatedNodeId);
-        return n.getGeneratedNodeId();
+        if(n.getParentNodeId() != null) {
+            int generatedNodeId = pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
+            n.setGeneratedNodeId(generatedNodeId);
+            return n.getGeneratedNodeId();
+        } else {
+            logger.debug("Error in createParentNode with placeholders: No parent id.");
+            return -1;
+        }
     }
 
     public int createAncestorNode(Node n)
@@ -182,16 +203,15 @@ public class NodesService {
 
     public boolean addPageIdtoNode(int generatedNodeId , int pageId)
     {
-        boolean flag = TaxonM.addPageIdtoNode(generatedNodeId,pageId);
-        return flag;
+        if(TaxonM.addPageIdtoNode(generatedNodeId, pageId) > -1)
+            return true;
+        else
+            return false;
     }
 
     public int addPageIdtoNode(int generatedNodeId) {
-        int pageId = parser.getPageId();
-        if(TaxonM.addPageIdtoNode(generatedNodeId, pageId))
-            return pageId;
-        else
-            return -1;
+//        int pageId = parser.getPageId();
+        return TaxonM.addPageIdtoNode(generatedNodeId, -1);
     }
 
     public ArrayList<Node> getNativeVirusNode() {
@@ -228,5 +248,14 @@ public class NodesService {
         int generatedNodeId =  parser.updateAcceptedNode(n.getResourceId(), n.getNodeId(),
                 n.getParentGeneratedNodeId(), n.getScientificName());
         return generatedNodeId;
+    }
+
+    public int harvestResource(String type, String resourceId) throws IOException {
+        if(type.equalsIgnoreCase("1"))
+            return parser.harvestParentFormatResource(resourceId, app.getResourcesDirectory(), app.getNeo4jDirectory());
+//        else if(type.equalsIgnoreCase("2"))
+//            return parser.harvestAncestoryFormatResource(resourceId, app.getResourcesDirectory());
+        else
+            return 3;
     }
 }

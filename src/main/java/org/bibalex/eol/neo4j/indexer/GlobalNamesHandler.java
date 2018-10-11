@@ -36,6 +36,7 @@ public class GlobalNamesHandler {
 
     private String parseAndGetResultString(String name, String attribute) {
         JSONObject attr = (JSONObject) getParsedJson(name).get(attribute);
+        if(attr == null) return null;
         Object att = attr.get("value");
         return att == null ? null : att.toString();
 

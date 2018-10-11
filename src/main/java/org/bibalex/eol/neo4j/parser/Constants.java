@@ -19,6 +19,7 @@ public class Constants {
     public static final String NODE_ATTRIBUTE_ACCEPTED_NODEID = "accepted_node_id";
     public static final String NODE_ATTRIBUTE_RESOURCEID = "resource_id";
     public static final String NODE_ATTRIBUTE_RANK = "rank";
+    public static final String NODE_ATTRIBUTE_UPDATED_AT = "updated_at";
     public static final String NODE_ATTRIBUTE_PAGEID = "page_id";
     public static final String PLACE_HOLDER = "placeholder";
 
