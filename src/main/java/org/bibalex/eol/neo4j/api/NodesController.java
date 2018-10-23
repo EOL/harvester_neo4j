@@ -54,7 +54,11 @@ public class NodesController {
         return generatedNodeId;
     }
 
-
+    /**
+     *
+     * @param n the node that has a parent not created before
+     * @return the generated auto id of the new created parent
+     */
     @RequestMapping(value="/createParentWithPlaceholder", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public int createParentNode(@RequestBody Node n)
     {
@@ -210,6 +214,18 @@ public class NodesController {
     public boolean setNativeVirusNode(@PathVariable("generatedNodeId") int generatedNodeId) {
         return service.setNativeVirusNode(generatedNodeId);
     }
+
+    /**
+     *
+     * @param type
+     * @param resourceId
+     * @return integer harvest status 1 for success, 2 for failure, and 3 for unsupported format
+     */
+    @RequestMapping(value="/harvestResource/{type}/{resourceId}", method = RequestMethod.POST)
+    public int harvestResource(@PathVariable("type") String type, @PathVariable("resourceId") String resourceId) {
+        return service.harvestResource(type, resourceId);
+    }
+
 
     /**
      * fetches the nodes data by their ids.

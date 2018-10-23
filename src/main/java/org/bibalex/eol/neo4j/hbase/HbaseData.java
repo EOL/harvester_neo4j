@@ -17,7 +17,7 @@ public class HbaseData extends Neo4jCommon{
     {
         logger.info("Getting ancestors of node with autoId" + generatedNodeId);
         ArrayList<String> ancestors = new ArrayList<>();
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})<-[:IS_PARENT_OF*]-(p) return p.generated_auto_id";
+        String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}})<-[:IS_PARENT_OF*]-(p) return p.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
@@ -31,7 +31,7 @@ public class HbaseData extends Neo4jCommon{
     {
         logger.info("Getting children of node with autoId" + generatedNodeId);
         ArrayList<String> children = new ArrayList<>();
-        String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c.generated_auto_id";
+        String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {

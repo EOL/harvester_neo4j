@@ -10,23 +10,24 @@ public class Neo4jParentFormat extends Neo4jCommon  {
 
     public int createParentWithPlaceholder(int resourceId, String parentUsageId)
     {
-        int nodeGeneratedNodeId = getNodeIfExist(parentUsageId, resourceId);
-        if (nodeGeneratedNodeId == -1)
-        {
-            autoId = getAutoId();
-            String create_query = "CREATE (n:Node {resource_id: {resourceId}, node_id: {parentUsageId}," +
-                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: {autoId}," +
+//        int nodeGeneratedNodeId = getNodeIfExist(parentUsageId, resourceId);
+//        if (nodeGeneratedNodeId == -1)
+//        {
+        System.out.print("--->" + parentUsageId);
+//            autoId = getAutoId();
+            String create_query = "MATCH (c:IdCounter) CREATE (n:Node:GNode" + ((parentUsageId == "0")? (":" + Constants.ROOT_LABEL) : "") + " {resource_id: {resourceId}, node_id: {parentUsageId}," +
+                    " scientific_name: {scientificName}, rank: {rank}, generated_auto_id: c.nextId," +
                     " created_at: timestamp(),updated_at: timestamp()})" +
-                    "RETURN n.generated_auto_id";
+                    " SET c.nextId = c.nextId + 1 RETURN n.generated_auto_id";
+            logger.debug("createParentWithPlaceholder: " + create_query);
             StatementResult result = getSession().run(create_query, parameters("resourceId", resourceId,
-                    "parentUsageId", parentUsageId, "scientificName", Constants.PLACE_HOLDER, "rank", Constants.PLACE_HOLDER, "autoId", autoId));
-            if(parentUsageId == "0")
-            {
-                logger.debug("Node is a root node");
-                create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
-                result = getSession().run(create_query, parameters("autoId", autoId));
-            }
-            autoId++;
+                    "parentUsageId", parentUsageId, "scientificName", Constants.PLACE_HOLDER, "rank", Constants.PLACE_HOLDER));
+//            if(parentUsageId == "0")
+//            {
+//                logger.debug("Node is a root node");
+//                create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
+//                result = getSession().run(create_query, parameters("autoId", autoId));
+//            }
             if (result.hasNext()) {
                 logger.debug("Node with id " + parentUsageId + " created with placeholders");
                 Record record = result.next();
@@ -35,21 +36,21 @@ public class Neo4jParentFormat extends Neo4jCommon  {
                 logger.debug("Node with id  " + parentUsageId + " is not created a problem has occurred");
                 return -1;
             }
-        }
-        else
-        {
-            logger.debug("Node with nodeId "+ parentUsageId +"  found");
-            return nodeGeneratedNodeId;
-        }
+//        }
+//        else
+//        {
+//            logger.debug("Node with nodeId "+ parentUsageId +"  found");
+//            return nodeGeneratedNodeId;
+//        }
 
     }
 
     public int getNodeGivenParentIfExists(int resourceId, String scientificName, String rank, String nodeId, int parentGeneratedNodeId, boolean parentNecessary)
     {
-        String query = "MATCH (n {resource_id: {resourceId} , scientific_name: {scientificName}," +
+        String query = "MATCH (n:GNode {resource_id: {resourceId} , scientific_name: {scientificName}," +
                 " rank: {rank}, node_id: {nodeId}})<-[r:IS_PARENT_OF]-(p {generated_auto_id: {parentGeneratedNodeId}}) RETURN n.generated_auto_id LIMIT 1 ";
         // Match the root node that has no parent
-        query += (parentNecessary)? "" : "UNION MATCH (n:Root {resource_id: {resourceId} , scientific_name: {scientificName}, rank: {rank}, node_id: {nodeId}}) RETURN n.generated_auto_id";
+        query += (parentNecessary)? "" : "UNION MATCH (n:Root:GNode {resource_id: {resourceId} , scientific_name: {scientificName}, rank: {rank}, node_id: {nodeId}}) RETURN n.generated_auto_id";
         StatementResult result = getSession().run(query, parameters( "resourceId",resourceId,
                 "scientificName", scientificName, "rank", rank ,"nodeId", nodeId, "parentGeneratedNodeId", parentGeneratedNodeId));
 //        logger.debug("query:" + query);
