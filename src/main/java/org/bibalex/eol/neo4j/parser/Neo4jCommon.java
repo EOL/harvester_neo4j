@@ -361,7 +361,7 @@ public class Neo4jCommon {
     {
         int parentGeneratedNodeId;
         logger.debug("Get parent of node with autoId  " + generatedNodeId );
-        String query = "MATCH(a:Node {generated_auto_id : {generatedNodeId}})<-[:IS_PARENT_OF*]-(n) RETURN n.generated_auto_id LIMIT 1";
+        String query = "MATCH(a:GNode {generated_auto_id : {generatedNodeId}})<-[:IS_PARENT_OF*]-(n) RETURN n.generated_auto_id LIMIT 1";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         if(result.hasNext())
         {

@@ -90,7 +90,7 @@ public class TaxonMatching extends Neo4jCommon{
         {
 
             logger.debug("Found Match and adding pageId");
-            String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = {pageId}";
+            String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = {pageId} RETURN n.page_id";
             StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId ));
             if(result.hasNext())
         {
