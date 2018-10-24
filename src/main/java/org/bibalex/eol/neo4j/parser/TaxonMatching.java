@@ -15,7 +15,7 @@ public class TaxonMatching extends Neo4jCommon{
     public ArrayList<Node> getAncestorsNodes(int generatedNodeId)
     {
         ArrayList<Node> old_branch = new ArrayList<>();
-        String query = "MATCH (n:Node {generated_auto_id: {generatedNodeId}})<-[:IS_PARENT_OF*]-(p) return p";
+        String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}})<-[:IS_PARENT_OF*]-(p) return p";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
@@ -31,7 +31,7 @@ public class TaxonMatching extends Neo4jCommon{
     {
         logger.info("Getting children of node with autoId" + generatedNodeId);
         ArrayList<Node> children = new ArrayList<>();
-        String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c";
+        String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {
@@ -59,26 +59,62 @@ public class TaxonMatching extends Neo4jCommon{
 
     public int addPageIdtoNode(int generatedNodeId, int pageId)
     {
+
+//        int page_Id = -1;
+//        logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
+//        String query = "MATCH (c:IdCounter) MATCH (n {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = c.nextPageId," +
+//                " n.updated_at = timestamp() SET c.nextPageId = c.nextPageId + 1 RETURN n.page_id";
+//        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
+
+//        int page_Id = -1;
+//        logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
+//        String query = "MATCH (c:GlobalUniqueId) MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = c.page_id," +
+//                " n.updated_at = timestamp() SET c.page_id = c.page_id + 1 RETURN n.page_id";
+//        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
+//        if(result.hasNext())
+//        {
+//            Record record = result.next();
+//            if(record.get("n.page_id")!= NULL)
+//                page_Id = record.get("n.page_id").asInt();
+//
+//        }
+//        return page_Id;
         int page_Id = -1;
-        logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId "+ generatedNodeId);
-        String query = "MATCH (c:IdCounter) MATCH (n {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = c.nextPageId," +
-                " n.updated_at = timestamp() SET c.nextPageId = c.nextPageId + 1 RETURN n.page_id";
-        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
-        if(result.hasNext())
-        {
-            Record record = result.next();
-            if(record.get("n.page_id")!= NULL)
-                page_Id = record.get("n.page_id").asInt();
+        if (pageId == -1) {
+            logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId " + generatedNodeId);
+            String query = "MATCH (c:GlobalUniqueId) MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = c.page_id," +
+                    " n.updated_at = timestamp() SET c.page_id = c.page_id + 1 RETURN n.page_id";
+            StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
+            if(result.hasNext()) {
+                Record record = result.next();
+                if(record.get("n.page_id")!= NULL)
+                    page_Id = record.get("n.page_id").asInt();
+
+             }
+        return page_Id;
+        }
+
+        else {
+            logger.debug("Found Match and adding pageId");
+            String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = {pageId}" +
+                    " RETURN n.page_id";
+            StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId ));
+            if(result.hasNext()) {
+                Record record = result.next();
+                if(record.get("n.page_id")!= NULL)
+                    page_Id = record.get("n.page_id").asInt();
+
+            }
 
         }
-        return page_Id;
+         return page_Id;
     }
 
     public ArrayList<Node> getSynonyms(int generatedNodeId)
     {
         logger.info("Getting synonyms of node with autoId" + generatedNodeId);
         ArrayList<Node> synonyms = new ArrayList<>();
-        String query = "MATCH (a {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s";
+        String query = "MATCH (a:GNode {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
         {

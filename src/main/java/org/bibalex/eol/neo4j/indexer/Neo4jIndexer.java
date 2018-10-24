@@ -23,18 +23,19 @@ public class Neo4jIndexer  extends HbaseData {
     public ArrayList<JSONObject> Neo4jToJson (int[] generatedNodeIds) {
         globalNameHandler = new GlobalNamesHandler();
         jsonFile =new JsonFileWriter();
-        for(int j=0 ; j<generatedNodeIds.length ; j++) {
-            int generatedNodeId = generatedNodeIds[j];
-            StatementResult result = getnNodeData(generatedNodeId);
+//        for(int j=0 ; j<generatedNodeIds.length ; j++) {
+//            int generatedNodeId = generatedNodeIds[j];
+            StatementResult result = getnNodeData(generatedNodeIds);
 
 
-            if (result.hasNext()) {
+            while (result.hasNext()) {
                 jsonFile.renew();
                 Record record = result.next();
 
                 //if page_id is null -1 will be retuened
                 //scientific name can't be null but can be empty string("") will return "" same for canonical name
                 //rank can be null and can be empty string will return in both cases ""
+                int generatedNodeId = record.get("n.generated_auto_id").asInt();
                 int pageId = record.get("n.page_id")==NULL?-1:record.get("n.page_id").asInt();
                 String scientificName =  record.get("n.scientific_name").asString();
                 int resourceId =  record.get("n.resource_id").asInt();
@@ -70,20 +71,22 @@ public class Neo4jIndexer  extends HbaseData {
 
 
             }
-        }
+//        }
 
         ArrayList<JSONObject> nodes = jsonFile.getNodes();
         jsonFile.printObj();
         return nodes;
     }
 
-    public  StatementResult getnNodeData (int generatedNodeId)
+    public  StatementResult getnNodeData (int [] generatedNodeIds)
     {
-        logger.info("Getting scientific name and rank of node with autoId" + generatedNodeId);
-        String query = "MATCH (n {generated_auto_id : {generatedNodeId}})"+
-                " RETURN n.scientific_name, n.rank, n.resource_id, n.page_id" ;
+        logger.info("Getting scientific name and rank of node with autoId" + generatedNodeIds);
+//        String query = "MATCH (n:GNode {generated_auto_id : {generatedNodeId}})"+
+//                " RETURN n.scientific_name, n.rank, n.resource_id, n.page_id" ;
+        String query = "WITH {generatedNodeIds} as generated_node_ids MATCH (n:GNode) WHERE n.generated_auto_id in generated_node_ids " +
+                "RETURN n.generated_auto_id, n.scientific_name, n.rank, n.resource_id, n.page_id";
 
-        StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId ));
+        StatementResult result = getSession().run(query, parameters("generatedNodeIds", generatedNodeIds ));
 
         return result;
     }
@@ -93,7 +96,7 @@ public class Neo4jIndexer  extends HbaseData {
         logger.info("Getting synonyms of node with autoId" + generatedNodeId);
         ArrayList<String> synonymsSameResource = new ArrayList<>();
         ArrayList<String> synonymsOtherResources = new ArrayList<>();
-        String query = "MATCH (a {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.scientific_name , s.resource_id";
+        String query = "MATCH (a:GNode {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.scientific_name , s.resource_id";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         while (result.hasNext())
         {

@@ -361,7 +361,7 @@ public class Neo4jCommon {
     {
         int parentGeneratedNodeId;
         logger.debug("Get parent of node with autoId  " + generatedNodeId );
-        String query = "MATCH(a:Node {generated_auto_id : {generatedNodeId}})<-[:IS_PARENT_OF*]-(n) RETURN n.generated_auto_id LIMIT 1";
+        String query = "MATCH(a:GNode {generated_auto_id : {generatedNodeId}})<-[:IS_PARENT_OF*]-(n) RETURN n.generated_auto_id LIMIT 1";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         if(result.hasNext())
         {
@@ -396,7 +396,7 @@ public class Neo4jCommon {
 
     public boolean hasChildren(int generatedNodeId) {
         logger.debug("Checking if node with generated_auto_id " + generatedNodeId + " has children");
-        String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) RETURN c";
+        String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) RETURN c";
         StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
         if (result.hasNext()) {
             logger.debug("Yes node has children");
@@ -596,7 +596,7 @@ public class Neo4jCommon {
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
         List<HashMap<Integer, Integer>> nodes = new ArrayList<HashMap<Integer, Integer>>();
         for(Integer gNodeId : generatedNodesIds) {
-            String query = " MATCH len = (p)-[:IS_PARENT_OF*0..]->(n:Node {generated_auto_id: {generatedNodeId}}) " +
+            String query = " MATCH len = (p)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}}) " +
                     "return length(len) AS len, p.generated_auto_id as id";
             HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
             StatementResult result = getSession().run(query, parameters("generatedNodeId",

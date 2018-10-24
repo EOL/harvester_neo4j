@@ -41,7 +41,8 @@ public class NodesService {
 
     @PostConstruct
     private void init() {
-        parser.createInitNode();
+
+//        parser.createInitNode();
     }
 
     public int createNode(Node n)
@@ -250,9 +251,15 @@ public class NodesService {
         return generatedNodeId;
     }
 
-    public int harvestResource(String type, String resourceId) throws IOException {
-        if(type.equalsIgnoreCase("1"))
-            return parser.harvestParentFormatResource(resourceId, app.getResourcesDirectory(), app.getNeo4jDirectory());
+    public int harvestResource(String type, String resourceId) {
+        if(type.equalsIgnoreCase("1")) {
+            try {
+                return parser.harvestParentFormatResource(resourceId, app.getResourcesDirectory(), app.getNeo4jDirectory());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        }
 //        else if(type.equalsIgnoreCase("2"))
 //            return parser.harvestAncestoryFormatResource(resourceId, app.getResourcesDirectory());
         else
