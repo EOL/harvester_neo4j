@@ -7,6 +7,8 @@ import org.neo4j.driver.v1.Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.neo4j.driver.v1.Values.NULL;
 import static org.neo4j.driver.v1.Values.parameters;
@@ -108,6 +110,25 @@ public class TaxonMatching extends Neo4jCommon{
 
         }
          return page_Id;
+    }
+
+    public boolean addPagestoNode(HashMap<Integer,Integer> results)
+    {
+            for (Integer generatedNodeId : results.keySet()) {
+                Integer pageId = results.get(generatedNodeId);
+                String query =  "MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = {pageId}" +
+                    " RETURN n.page_id";
+                StatementResult qresult = getSession().run(query, parameters("generatedNodeId", generatedNodeId, "pageId", pageId ));
+                if(qresult.hasNext()) {
+                    Record record = qresult.next();
+                    logger.debug(" The pageId " +record.get("n.page_id"));
+                    if (record.get("n.page_id") == NULL)
+                        return  false;
+
+                }
+
+        }
+        return true;
     }
 
     public ArrayList<Node> getSynonyms(int generatedNodeId)

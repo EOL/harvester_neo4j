@@ -195,6 +195,13 @@ public class NodesController {
 
     }
 
+    @RequestMapping(value = "/addPagestoNode", method = RequestMethod.POST, consumes = "application/json")
+    public boolean addPagestoNode(@RequestBody HashMap<Integer,Integer> results) throws IOException
+    {
+        boolean flag = service.addPagestoNode(results);
+        return flag;
+    }
+
     @RequestMapping(value="/addPageIdtoNode/{generatedNodeId}", method = RequestMethod.GET, produces = "application/json")
     public int addPageIdtoNode(@PathVariable("generatedNodeId") int generatedNodeId) {
         return service.addPageIdtoNode(generatedNodeId);
@@ -247,6 +254,11 @@ public class NodesController {
     @RequestMapping(value="/getAncestors", method = RequestMethod.POST, produces = "application/json")
     public List<HashMap<Integer, Integer>> getNodeAncestors(@RequestBody List<Integer> generatedNodesIds) {
         return service.getNodeAncestors(generatedNodesIds);
+    }
+
+    @RequestMapping(value="/getPageIds", method = RequestMethod.POST, produces = "application/json")
+    public List< Integer> getPageIds(@RequestBody List<Integer> generatedNodesIds) {
+        return service.getPageIds(generatedNodesIds);
     }
 
     @RequestMapping(value="/updateAcceptedNode", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")

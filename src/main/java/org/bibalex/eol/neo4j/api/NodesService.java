@@ -210,6 +210,11 @@ public class NodesService {
             return false;
     }
 
+    public boolean addPagestoNode(HashMap<Integer,Integer> results)
+    {
+        return TaxonM.addPagestoNode(results);
+    }
+
     public int addPageIdtoNode(int generatedNodeId) {
 //        int pageId = parser.getPageId();
         return TaxonM.addPageIdtoNode(generatedNodeId, -1);
@@ -242,6 +247,10 @@ public class NodesService {
 
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
         return parser.getNodeAncestors(generatedNodesIds);
+    }
+
+    public List<Integer> getPageIds(List<Integer> generatedNodesIds) {
+        return parser.getPageIds(generatedNodesIds);
     }
 
     public int updateAcceptedNode(Node n)
