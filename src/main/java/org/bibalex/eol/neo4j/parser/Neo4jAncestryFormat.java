@@ -4,17 +4,14 @@ import org.apache.commons.codec.binary.StringUtils;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.csv.reader.Mark;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.StatementResult;
+import org.neo4j.driver.Value;
 import org.neo4j.graphdb.Transaction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jAncestryFormat extends Neo4jCommon {
 
@@ -72,6 +69,26 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
 
         }
 
+    }
+
+    public List<Node> getNodesWithPlaceholder(int resourceId)
+    {
+        List<Node> nodes = new ArrayList<Node>();
+        Node node = new Node();
+        String query = "MATCH(n:Gnode {node_id: {nodeId}, resource_id: {resourceId}}) RETURN n";
+        StatementResult result = getSession().run(query, parameters("nodeId", "placeholder", "resourceId", resourceId));
+        while (result.hasNext()) {
+            Record record = result.next();
+            node.setGeneratedNodeId(record.get("n.generated_auto_id").asInt());
+            node.setNodeId(record.get("n.node_id").asString());
+            node.setRank(record.get("n.rank").asString());
+            node.setScientificName(record.get("n.scientific_name").asString());
+            node.setResourceId(record.get("n.resource_id").asInt());
+            node.setPageId(record.get("n.page_id").asInt());
+
+            nodes.add(node);
+        }
+       return nodes;
     }
 
     public int getAncestoryFormatNodeIfExist(int resourceId, String scientificName, int parentGeneratedNodeId )

@@ -8,7 +8,7 @@ import org.bibalex.eol.neo4j.models.PropertiesFile;
 import org.bibalex.eol.neo4j.parser.*;
 import org.bibalex.eol.neo4j.models.Node;
 import org.json.simple.JSONObject;
-import org.neo4j.driver.v1.Session;
+import org.neo4j.driver.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,6 +194,12 @@ public class NodesService {
     {
         ArrayList<Node> children = TaxonM.getChildrenNode(generatedNodeId);
         return children;
+    }
+
+    public List<Node> getNodesWithPlaceholder(int resourceId)
+    {
+        List<Node> nodes = aNode.getNodesWithPlaceholder(resourceId);
+        return nodes;
     }
 
     public boolean hasChildren(int generatedNodeId)
