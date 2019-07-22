@@ -44,10 +44,7 @@ public class Node implements Serializable{
         return scientificName;
     }
 
-    public void setScientificName(String scientificName)
-    {
-        this.scientificName = scientificName;
-    }
+    public void setScientificName(String scientificName) { this.scientificName = scientificName;}
 
     public int getGeneratedNodeId()
     {
@@ -74,10 +71,7 @@ public class Node implements Serializable{
         return parentGeneratedNodeId;
     }
 
-    public void setParentGeneratedNodeId(int parentGeneratedNodeId)
-    {
-        this.parentGeneratedNodeId = parentGeneratedNodeId;
-    }
+    public void setParentGeneratedNodeId(int parentGeneratedNodeId){this.parentGeneratedNodeId = parentGeneratedNodeId; }
 
     public String getParentNodeId()
     {
@@ -94,10 +88,7 @@ public class Node implements Serializable{
         return acceptedNodeId;
     }
 
-    public void setAcceptedNodeId(String acceptedNodeId)
-    {
-
-        this.acceptedNodeId = acceptedNodeId;
+    public void setAcceptedNodeId(String acceptedNodeId){ this.acceptedNodeId = acceptedNodeId;
     }
 
     public int getAcceptedNodeGeneratedId()

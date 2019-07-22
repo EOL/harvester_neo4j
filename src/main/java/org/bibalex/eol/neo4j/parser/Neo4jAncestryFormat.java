@@ -71,20 +71,24 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
 
     }
 
-    public List<Node> getNodesWithPlaceholder(int resourceId)
+    public ArrayList<Node> getNodesWithPlaceholder(int resourceId)
     {
-        List<Node> nodes = new ArrayList<Node>();
-        Node node = new Node();
-        String query = "MATCH(n:Gnode {node_id: {nodeId}, resource_id: {resourceId}}) RETURN n";
-        StatementResult result = getSession().run(query, parameters("nodeId", "placeholder", "resourceId", resourceId));
+        ArrayList<Node> nodes = new ArrayList<Node>();
+        String query = "MATCH(n:GNode {node_id: 'placeholder', resource_id: {resourceId}}) RETURN n";
+        StatementResult result = getSession().run(query, parameters( "resourceId", resourceId));
         while (result.hasNext()) {
             Record record = result.next();
-            node.setGeneratedNodeId(record.get("n.generated_auto_id").asInt());
-            node.setNodeId(record.get("n.node_id").asString());
-            node.setRank(record.get("n.rank").asString());
-            node.setScientificName(record.get("n.scientific_name").asString());
-            node.setResourceId(record.get("n.resource_id").asInt());
-            node.setPageId(record.get("n.page_id").asInt());
+            Node node = new Node();
+            Value  data = record.get("n");
+            int gnode = data.get("generated_auto_id").isNull() ? -1 : data.get("generated_auto_id").asInt();
+            node.setGeneratedNodeId(gnode);
+            node.setNodeId(data.get("node_id").asString());
+            node.setRank(data.get("rank").asString());
+            node.setScientificName(data.get("scientific_name").asString());
+            resourceId = data.get("resource_id").isNull() ? -1 : data.get("resource_id").asInt();
+            node.setResourceId(resourceId);
+            int page = data.get("page_id").isNull() ? -1 : data.get("page_id").asInt();
+            node.setPageId(page);
 
             nodes.add(node);
         }

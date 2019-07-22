@@ -1,10 +1,10 @@
 package org.bibalex.eol.neo4j.parser;
 
 import org.bibalex.eol.neo4j.models.Node;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.StatementResult;
 
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jParentFormat extends Neo4jCommon  {
 

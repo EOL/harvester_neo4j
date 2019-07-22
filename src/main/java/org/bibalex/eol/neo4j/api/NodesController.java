@@ -166,9 +166,9 @@ public class NodesController {
     }
 
     @RequestMapping(value="getNodesWithPlaceholder/{resourceId}", method= RequestMethod.GET, produces = "application/json")
-    public List <Node> getNodesWithPlaceholder(@PathVariable("resourceId") int resourceId)
+    public ArrayList <Node> getNodesWithPlaceholder(@PathVariable("resourceId") int resourceId)
     {
-        List <Node> nodes = service.getNodesWithPlaceholder(resourceId);
+        ArrayList <Node> nodes = service.getNodesWithPlaceholder(resourceId);
         return nodes;
     }
 

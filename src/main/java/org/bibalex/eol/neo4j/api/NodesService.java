@@ -196,9 +196,9 @@ public class NodesService {
         return children;
     }
 
-    public List<Node> getNodesWithPlaceholder(int resourceId)
+    public ArrayList<Node> getNodesWithPlaceholder(int resourceId)
     {
-        List<Node> nodes = aNode.getNodesWithPlaceholder(resourceId);
+        ArrayList<Node> nodes = aNode.getNodesWithPlaceholder(resourceId);
         return nodes;
     }
 

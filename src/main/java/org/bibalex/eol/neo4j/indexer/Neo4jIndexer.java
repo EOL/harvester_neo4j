@@ -2,7 +2,7 @@ package org.bibalex.eol.neo4j.indexer;
 
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.json.simple.JSONObject;
-import org.neo4j.driver.v1.*;
+import org.neo4j.driver.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static org.neo4j.driver.v1.Values.NULL;
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.NULL;
+import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jIndexer  extends HbaseData {
     java.util.logging.Logger logger =  Logger.getLogger("neo4j indexing");

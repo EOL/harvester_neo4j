@@ -43,6 +43,7 @@
             <artifactId>neo4j-java-driver</artifactId>
             <version>LATEST</version>
         </dependency>
+
         <dependency>
             <groupId>org.neo4j.procedure</groupId>
             <artifactId>apoc</artifactId>
@@ -54,9 +55,6 @@
             <artifactId>maven-resources-plugin</artifactId>
             <version>2.6</version>
         </dependency>
-
-
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

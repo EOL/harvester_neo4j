@@ -1,10 +1,11 @@
 package org.bibalex.eol.neo4j.parser;
 
+import apoc.util.ArrayBackedList;
 import org.bibalex.eol.neo4j.models.Node;
-import org.neo4j.driver.v1.*;
+import org.neo4j.driver.*;
 
-import static org.neo4j.driver.v1.Values.NULL;
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.NULL;
+import static org.neo4j.driver.Values.parameters;
 
 
 import org.slf4j.Logger;
@@ -593,10 +594,28 @@ public class Neo4jCommon {
         return nodes;
     }
 
+    public List<Integer> getPageIds(List<Integer> generatedNodeIds){
+
+        List<Integer> pages = new ArrayList();
+        for (Integer gNodeId : generatedNodeIds){
+            String query = "MATCH(n:GNode {generated_auto_id: {generatedNodeId}}) return n.page_id as page";
+            StatementResult result = getSession().run(query, parameters("generatedNodeId",
+                    gNodeId));
+            while (result.hasNext()){
+                logger.debug("Node:" + gNodeId);
+                Record record = result.next();
+                 if(record.get("page").isNull())
+                     pages.add(-1);
+                 else
+                     pages.add(record.get("page").asInt());
+            }
+        }
+        return pages;
+    }
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
         List<HashMap<Integer, Integer>> nodes = new ArrayList<HashMap<Integer, Integer>>();
         for(Integer gNodeId : generatedNodesIds) {
-            String query = " MATCH len = (p)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}}) " +
+            String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}}) " +
                     "return length(len) AS len, p.generated_auto_id as id";
             HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
             StatementResult result = getSession().run(query, parameters("generatedNodeId",
