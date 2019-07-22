@@ -1,17 +1,17 @@
 package org.bibalex.eol.neo4j.parser;
 
 import org.bibalex.eol.neo4j.models.Node;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.StatementResult;
+import org.neo4j.driver.Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.neo4j.driver.v1.Values.NULL;
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.NULL;
+import static org.neo4j.driver.Values.parameters;
 
 public class TaxonMatching extends Neo4jCommon{
     public ArrayList<Node> getAncestorsNodes(int generatedNodeId)

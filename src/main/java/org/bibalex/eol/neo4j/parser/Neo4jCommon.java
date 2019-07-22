@@ -1,10 +1,10 @@
 package org.bibalex.eol.neo4j.parser;
 
 import org.bibalex.eol.neo4j.models.Node;
-import org.neo4j.driver.v1.*;
+import org.neo4j.driver.*;
 
-import static org.neo4j.driver.v1.Values.NULL;
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.NULL;
+import static org.neo4j.driver.Values.parameters;
 
 
 import org.slf4j.Logger;

@@ -1,14 +1,14 @@
 package org.bibalex.eol.neo4j.hbase;
 
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.StatementResult;
 
 import java.lang.reflect.AnnotatedArrayType;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.parameters;
 
 public class HbaseData extends Neo4jCommon{
      Logger logger =  Logger.getLogger("HbaseData");

@@ -3,14 +3,14 @@ package org.bibalex.eol.neo4j.backend_api;
 import org.bibalex.eol.neo4j.models.Node;
 
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
-import org.neo4j.driver.v1.Record;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.StatementResult;
+import org.neo4j.driver.Value;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import static org.neo4j.driver.v1.Values.parameters;
+import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jTree extends Neo4jCommon{
     Node root = new Node();
