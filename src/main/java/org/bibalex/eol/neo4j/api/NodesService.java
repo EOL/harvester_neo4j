@@ -1,5 +1,7 @@
 package org.bibalex.eol.neo4j.api;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.indexer.Neo4jIndexer;
@@ -9,8 +11,7 @@ import org.bibalex.eol.neo4j.parser.*;
 import org.bibalex.eol.neo4j.models.Node;
 import org.json.simple.JSONObject;
 import org.neo4j.driver.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class NodesService {
     NodeData nodeData = new NodeData();
     Neo4jTree forest = new Neo4jTree();
     TaxonMatching TaxonM = new TaxonMatching();
-    Logger logger = LoggerFactory.getLogger(Neo4jCommon.class);
+    Logger logger = LogManager.getLogger(Neo4jCommon.class);
     private PropertiesFile app;
 
 

@@ -1,12 +1,13 @@
 package org.bibalex.eol.neo4j.indexer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 public class JsonFileWriter {
-    java.util.logging.Logger logger =  Logger.getLogger("json object creation");
+    Logger logger =  LogManager.getLogger(JsonFileWriter.class);
     JSONObject obj;
     JSONObject node;
     //    JSONObject nodes = new JSONObject();
@@ -19,28 +20,27 @@ public class JsonFileWriter {
 
 
     public void renew ()
-    {   logger.info("create new object and new node");
+    {   logger.info("Create New Object and New Node");
         obj  = new JSONObject();
 //        node = new JSONObject();
     }
 
     public void JsonAddString (String key ,String value)
     {
-        logger.info("adding string to json object with key: " + key + " and value: " + value);
+        logger.info("JSON Object- Key: " + key + ", Value: " + value);
         obj.put(key, value);
-
     }
 
     public void JsonAddInt (String key ,int value)
     {
-        logger.info("adding int to json object with key: " + key + " and value: " + value);
+        logger.info("JSON Object- Key: " + key + ", Value: " + value);
         obj.put(key, value);
-
     }
 
     public void JsonAddArray (String key,ArrayList list)
     {
-        logger.info("adding arraylist to json object with key: " + key);
+        logger.info("JSON Object- Key: " + key);
+        logger.debug("Value: " + list);
         obj.put(key, list);
     }
 
@@ -48,7 +48,7 @@ public class JsonFileWriter {
     {
 
         obj.put("generatedNodeId", generatedNodeId);
-        logger.info("add node to array of nodes");
+        logger.info("Adding Node: " + generatedNodeId + " to Nodes Array");
 //        node.put("node", obj);
         nodes.add(obj);
 
@@ -56,12 +56,14 @@ public class JsonFileWriter {
 
     public ArrayList<JSONObject> getNodes()
     {
-        logger.info("return nodes json objects");
+        logger.info("Return JSON Object of Nodes");
+        logger.debug("JSON Objects Array: \n" + nodes);
         return nodes;
     }
 
     public void printObj()
     {
-        System.out.println(nodes);
+//        System.out.println(nodes);
+        logger.debug(nodes);
     }
 }

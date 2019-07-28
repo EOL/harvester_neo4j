@@ -4,6 +4,9 @@ import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.StatementResult;
 import org.neo4j.driver.Value;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +17,7 @@ import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
 
 public class TaxonMatching extends Neo4jCommon{
+    private static final Logger logger = LogManager.getLogger(TaxonMatching.class);
     public ArrayList<Node> getAncestorsNodes(int generatedNodeId)
     {
         ArrayList<Node> old_branch = new ArrayList<>();
@@ -31,7 +35,7 @@ public class TaxonMatching extends Neo4jCommon{
 
     public ArrayList<Node> getChildrenNode(int generatedNodeId)
     {
-        logger.info("Getting children of node with autoId" + generatedNodeId);
+        logger.info("Getting Children of Node: " + generatedNodeId);
         ArrayList<Node> children = new ArrayList<>();
         String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c:Node) return c";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
@@ -41,12 +45,14 @@ public class TaxonMatching extends Neo4jCommon{
             Node node = setNode(record.get("c"));
             children.add(node);
         }
+        logger.debug("Children: \n" + children);
 
         return children;
     }
 
     public ArrayList<Node> getRootNodes(int resourceId)
     {
+        logger.info("Getting Root Nodes of Resource: " + resourceId);
         String query = "MATCH (n:Root {resource_id:{resourceId}}) RETURN n";
         StatementResult result = getSession().run(query,parameters("resourceId", resourceId));
         ArrayList<Node> roots = new ArrayList<>();
@@ -56,6 +62,7 @@ public class TaxonMatching extends Neo4jCommon{
             Node node = setNode(record.get("n"));
             roots.add(node);
         }
+        logger.debug("Root Nodes: \n" + roots);
         return roots;
     }
 
@@ -83,7 +90,7 @@ public class TaxonMatching extends Neo4jCommon{
 //        return page_Id;
         int page_Id = -1;
         if (pageId == -1) {
-            logger.debug("Add pageId from Taxon Matching Algorithm to Node with autoId " + generatedNodeId);
+            logger.debug("Add pageId from Taxon Matching Algorithm to Node:" + generatedNodeId);
             String query = "MATCH (c:GlobalUniqueId) MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = c.page_id," +
                     " n.updated_at = timestamp() SET c.page_id = c.page_id + 1 RETURN n.page_id";
             StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
@@ -93,6 +100,7 @@ public class TaxonMatching extends Neo4jCommon{
                     page_Id = record.get("n.page_id").asInt();
 
              }
+             logger.debug("Page ID: " + page_Id);
         return page_Id;
         }
 
@@ -109,7 +117,8 @@ public class TaxonMatching extends Neo4jCommon{
             }
 
         }
-         return page_Id;
+        logger.debug("Page ID: " + page_Id);
+        return page_Id;
     }
 
     public boolean addPagestoNode(HashMap<Integer,Integer> results)
@@ -133,7 +142,7 @@ public class TaxonMatching extends Neo4jCommon{
 
     public ArrayList<Node> getSynonyms(int generatedNodeId)
     {
-        logger.info("Getting synonyms of node with autoId" + generatedNodeId);
+        logger.info("Getting Synonyms of Node: " + generatedNodeId);
         ArrayList<Node> synonyms = new ArrayList<>();
         String query = "MATCH (a:GNode {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
@@ -144,6 +153,7 @@ public class TaxonMatching extends Neo4jCommon{
             Node node = setNode(record.get("s"));
             synonyms.add(node);
         }
+        logger.debug("Synonyms: \n" + synonyms);
         return synonyms;
     }
 

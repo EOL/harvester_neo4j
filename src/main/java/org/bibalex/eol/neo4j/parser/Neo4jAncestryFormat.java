@@ -1,6 +1,8 @@
 package org.bibalex.eol.neo4j.parser;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.csv.reader.Mark;
@@ -14,6 +16,7 @@ import java.util.*;
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jAncestryFormat extends Neo4jCommon {
+    private static final Logger logger = LogManager.getLogger(Neo4jAncestryFormat.class);
 
     public int createAncestorIfNotExist(int resourceId, String scientificName, String rank, String nodeId,
                                         int parentGeneratedNodeId, int pageId)
@@ -22,7 +25,8 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         int nodeGeneratedNodeId = getAncestoryFormatNodeIfExist(resourceId, scientificName, parentGeneratedNodeId);
         if (nodeGeneratedNodeId == -1)
         {
-            logger.debug("Node "+ scientificName +" not found creating a new node");
+            logger.debug("Node: "+ scientificName +"- Not Found");
+            logger.debug("Creating New Node");
 //            autoId = getAutoId();
             String hasPage = (pageId > 0)? (":" + Constants.HAS_PAGE_LABEL) : "";
             String create_query = " MATCH (c:IdCounter) CREATE (n:Node:GNode" + hasPage + " {resource_id: {resourceId}, node_id: {nodeId}," +
@@ -41,22 +45,22 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
             if(record != null) {
                 int genId = record.get("n.generated_auto_id").asInt();
                 if (parentGeneratedNodeId > 0) {
-                    logger.debug("Parent available with id " + parentGeneratedNodeId);
+                    logger.debug("Found Parent Node with ID: " + parentGeneratedNodeId);
                     createChildParentRelation(parentGeneratedNodeId, genId);
                 }
                 if (parentGeneratedNodeId < 0) {
-                    logger.debug("This node is created now and parent relation created later on");
+                    logger.debug("TA New Node is Successfully Created, Creating Parent Relation Later On");
                 }
                 if (parentGeneratedNodeId == 0) {
-                    logger.debug("Node is a root node");
+                    logger.debug("Node: " + genId + " is a Root Node");
                     create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
                     result = getSession().run(create_query, parameters("autoId", genId));
                 }
 
-                logger.debug("Node  " + scientificName + " created ");
+                logger.debug("Node: " + scientificName + "- Successfully Created ");
                 return genId;
             } else {
-                logger.debug("Node  " + scientificName + " is not created a problem has occurred");
+                logger.debug("Node:  " + scientificName + "- Failed to Create");
                 return -1;
             }
 
@@ -64,7 +68,7 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
 
         else
         {
-            logger.debug("Node "+ scientificName +"  found");
+            logger.debug("Node: "+ scientificName +"- Found");
             return nodeGeneratedNodeId;
 
         }
@@ -102,13 +106,13 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         if (result.hasNext())
         {
             Record record = result.next();
-            logger.debug("The result of search" +record.get("n.generated_auto_id").asInt() );
+            logger.debug("Search Results: \n" +record.get("n.generated_auto_id").asInt() );
             return record.get("n.generated_auto_id").asInt();
         }
 
         else
         {
-            logger.debug("The result is -1");
+            logger.debug("Search Result: -1");
             return -1;
         }
 

@@ -1,5 +1,7 @@
 package org.bibalex.eol.neo4j.indexer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.json.simple.JSONObject;
 import org.neo4j.driver.*;
@@ -8,13 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jIndexer  extends HbaseData {
-    java.util.logging.Logger logger =  Logger.getLogger("neo4j indexing");
+    Logger logger =  LogManager.getLogger(Neo4jIndexer.class);
 
 
     GlobalNamesHandler globalNameHandler;
@@ -57,14 +58,10 @@ public class Neo4jIndexer  extends HbaseData {
                 ArrayList<String> children = getChildren(generatedNodeId);
                 jsonFile.JsonAddArray("children IDS", children);
 
-
                 jsonFile.JsonAddArray("canonical synonyms", getCanonicalSynonymsSameResource(synonymsMap.get("synonyms same resource")));
                 jsonFile.JsonAddArray("other canonical synonyms", getCanonicalSynonymsOtherResources(synonymsMap.get("synonyms other resources")));
                 jsonFile.JsonAddString("is_hybrid", String.valueOf(globalNameHandler.isHybrid(scientificName)));
                 jsonFile.JsonAddString("canonical name", canonicalName);
-
-
-
 
                 jsonFile.JsonAddNode(generatedNodeId);
 
@@ -80,20 +77,20 @@ public class Neo4jIndexer  extends HbaseData {
 
     public  StatementResult getnNodeData (int [] generatedNodeIds)
     {
-        logger.info("Getting scientific name and rank of node with autoId" + generatedNodeIds);
+        logger.info("Getting Scientific Name and Rank of Node: " + generatedNodeIds);
 //        String query = "MATCH (n:GNode {generated_auto_id : {generatedNodeId}})"+
 //                " RETURN n.scientific_name, n.rank, n.resource_id, n.page_id" ;
         String query = "WITH {generatedNodeIds} as generated_node_ids MATCH (n:GNode) WHERE n.generated_auto_id in generated_node_ids " +
                 "RETURN n.generated_auto_id, n.scientific_name, n.rank, n.resource_id, n.page_id";
 
         StatementResult result = getSession().run(query, parameters("generatedNodeIds", generatedNodeIds ));
-
+        logger.info("Result: " + result);
         return result;
     }
 
     public Map getSynonymsNames(int generatedNodeId, int resource_id)
     {
-        logger.info("Getting synonyms of node with autoId" + generatedNodeId);
+        logger.info("Getting Synonyms of Node: " + generatedNodeId);
         ArrayList<String> synonymsSameResource = new ArrayList<>();
         ArrayList<String> synonymsOtherResources = new ArrayList<>();
         String query = "MATCH (a:GNode {generated_auto_id: {generatedNodeId}})<-[:IS_SYNONYM_OF]-(s:Synonym) return s.scientific_name , s.resource_id";
@@ -115,13 +112,14 @@ public class Neo4jIndexer  extends HbaseData {
         Map<String,ArrayList<String>> map =new HashMap();
         map.put("synonyms same resource",synonymsSameResource);
         map.put("synonyms other resources",synonymsOtherResources);
+        logger.debug(map);
         return map;
 
     }
 
     public ArrayList<String> getChildrenName(int generatedNodeId)
     {
-        logger.info("Getting children of node with autoId" + generatedNodeId);
+        logger.info("Getting Children of Node: " + generatedNodeId);
         ArrayList<String> children = new ArrayList<>();
         String query = "MATCH (n {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF]->(c) return c.scientific_name";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
@@ -130,19 +128,22 @@ public class Neo4jIndexer  extends HbaseData {
             Record record = result.next();
             children.add(record.get("c.scientific_name").asString() + "");
         }
+        logger.debug("Children: \n" + children);
         return children;
     }
 
     public  ArrayList<String> getCanonicalSynonymsSameResource(ArrayList<String> synonymsSameResource)
-    {   logger.info("Getting canonocal synonyms same resource of node" );
+    {   logger.info("Calling getCanonicalSynonymsSameResource" );
         ArrayList<String> canonicalSynonymsSameResource = getCanonical(synonymsSameResource);
+        logger.debug("Canonical Synonyms from The Same Resource: \n" + canonicalSynonymsSameResource);
         return canonicalSynonymsSameResource;
 
     }
 
     public  ArrayList<String> getCanonicalSynonymsOtherResources(ArrayList<String> synonymsOtherResources)
-    {   logger.info("Getting canonocal synonyms same resource of node" );
+    {   logger.info("Calling getCanonicalSynonymsOtherResources" );
         ArrayList<String> canonicalSynonymsOtherResources = getCanonical(synonymsOtherResources);
+        logger.debug("Canonical Synonyms from Other Resources: \n" + canonicalSynonymsOtherResources);
         return canonicalSynonymsOtherResources ;
     }
 

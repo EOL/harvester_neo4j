@@ -1,5 +1,8 @@
 package org.bibalex.eol.neo4j.backend_api;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.bibalex.eol.neo4j.models.Node;
 
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
@@ -8,18 +11,17 @@ import org.neo4j.driver.StatementResult;
 import org.neo4j.driver.Value;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jTree extends Neo4jCommon{
     Node root = new Node();
     ArrayList <Node> children= new ArrayList<>();
-    Logger logger =  Logger.getLogger("Neo4jTree");
+    Logger logger =  LogManager.getLogger(Neo4jTree.class);
 
     public void setRoot(int generatedNodeId)
     {
-        logger.info("The root is the node with generatedNodeId" + generatedNodeId);
+        logger.info("Root is Node with GeneratedNodeId: " + generatedNodeId);
         String query = "MATCH (n:Root {generated_auto_id: {generatedNodeId}}) return n";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",generatedNodeId));
         while (result.hasNext())
@@ -43,7 +45,7 @@ public class Neo4jTree extends Neo4jCommon{
 
     public void setChildren(int RootGeneratedNodeId)
     {
-        logger.info("Getting children of node with autoId" + RootGeneratedNodeId);
+        logger.info("Getting Children of Node: " + RootGeneratedNodeId);
         String query = "MATCH (n:Root {generated_auto_id: {generatedNodeId}})-[:IS_PARENT_OF*]->(c:Node)  return c";
         StatementResult result = getSession().run(query, parameters("generatedNodeId",RootGeneratedNodeId));
         while (result.hasNext())
@@ -72,7 +74,7 @@ public class Neo4jTree extends Neo4jCommon{
     {
         ArrayList<Object> roots = new ArrayList<>();
         ArrayList<Neo4jTree> trees = new ArrayList<>();
-        logger.info("Get the trees harvested after " + timestamp);
+        logger.info("Getting Trees Harvested After: " + timestamp);
         String query = "MATCH(n:Root) WHERE n.updated_at > apoc.date.parse({timestamp}, 'ms', 'dd.mm.yyyy') " +
                 " RETURN n.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("timestamp", timestamp));
@@ -96,7 +98,7 @@ public class Neo4jTree extends Neo4jCommon{
     {
         ArrayList<Object> roots = new ArrayList<>();
         ArrayList<Neo4jTree> trees = new ArrayList<>();
-        logger.info("Get the trees of resource " + resourceId);
+        logger.info("Getting Trees of Resource: " + resourceId);
         String query = "MATCH(n:Root) WHERE n.resource_id =  {resourceId} RETURN n.generated_auto_id";
         StatementResult result = getSession().run(query, parameters("resourceId", resourceId));
         while (result.hasNext())

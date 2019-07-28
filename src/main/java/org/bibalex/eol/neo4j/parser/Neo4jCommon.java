@@ -671,6 +671,7 @@ public class Neo4jCommon {
                 }
             } else {
                 logger.error("Can't update Accepted node scientific name ..");
+
             }
             return nodeGeneratedNodeId;
         }
