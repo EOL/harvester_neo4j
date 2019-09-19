@@ -83,7 +83,7 @@ public class Neo4jIndexer  extends HbaseData {
         logger.info("Getting scientific name and rank of node with autoId" + generatedNodeIds);
 //        String query = "MATCH (n:GNode {generated_auto_id : {generatedNodeId}})"+
 //                " RETURN n.scientific_name, n.rank, n.resource_id, n.page_id" ;
-        String query = "WITH {generatedNodeIds} as generated_node_ids MATCH (n:GNode) WHERE n.generated_auto_id in generated_node_ids " +
+        String query = "WITH {generatedNodeIds} as generated_node_ids MATCH (n:Node) WHERE n.generated_auto_id in generated_node_ids " +
                 "RETURN n.generated_auto_id, n.scientific_name, n.rank, n.resource_id, n.page_id";
 
         StatementResult result = getSession().run(query, parameters("generatedNodeIds", generatedNodeIds ));
