@@ -1,10 +1,10 @@
 package org.bibalex.eol.neo4j.hbase;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.StatementResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.AnnotatedArrayType;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import static org.neo4j.driver.Values.parameters;
 
 public class HbaseData extends Neo4jCommon{
-     Logger logger = LogManager.getLogger(HbaseData.class);
+     Logger logger = LoggerFactory.getLogger(HbaseData.class);
 
     public ArrayList<String> getAncestors(int generatedNodeId)
     {

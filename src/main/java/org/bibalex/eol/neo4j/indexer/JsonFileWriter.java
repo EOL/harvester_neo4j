@@ -1,13 +1,13 @@
 package org.bibalex.eol.neo4j.indexer;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 public class JsonFileWriter {
-    Logger logger =  LogManager.getLogger(JsonFileWriter.class);
+    Logger logger =  LoggerFactory.getLogger(JsonFileWriter.class);
     JSONObject obj;
     JSONObject node;
     //    JSONObject nodes = new JSONObject();
@@ -64,6 +64,6 @@ public class JsonFileWriter {
     public void printObj()
     {
 //        System.out.println(nodes);
-        logger.debug(nodes);
+        logger.debug(String.valueOf(nodes));
     }
 }

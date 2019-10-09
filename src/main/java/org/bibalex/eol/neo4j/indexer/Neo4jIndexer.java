@@ -1,10 +1,10 @@
 package org.bibalex.eol.neo4j.indexer;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.json.simple.JSONObject;
 import org.neo4j.driver.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jIndexer  extends HbaseData {
-    Logger logger =  LogManager.getLogger(Neo4jIndexer.class);
+    Logger logger =  LoggerFactory.getLogger(Neo4jIndexer.class);
 
 
     GlobalNamesHandler globalNameHandler;
@@ -112,7 +112,7 @@ public class Neo4jIndexer  extends HbaseData {
         Map<String,ArrayList<String>> map =new HashMap();
         map.put("synonyms same resource",synonymsSameResource);
         map.put("synonyms other resources",synonymsOtherResources);
-        logger.debug(map);
+        logger.debug(String.valueOf(map));
         return map;
 
     }

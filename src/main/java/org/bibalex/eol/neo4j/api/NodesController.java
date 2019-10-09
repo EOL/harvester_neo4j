@@ -1,13 +1,13 @@
 package org.bibalex.eol.neo4j.api;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.backend_api.Neo4jTree;
 import org.bibalex.eol.neo4j.models.NodeData;
 import org.bibalex.eol.neo4j.parser.Constants;
 import org.json.simple.JSONObject;
 
-import org.neo4j.register.Register;
+//import org.neo4j.register.Register;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class NodesController {
 
     @Autowired
     private NodesService service;
-    private static final Logger logger = LogManager.getLogger(NodesController.class);
+    private static final Logger logger = LoggerFactory.getLogger(NodesController.class);
 
 
     @RequestMapping(value = "/createNode", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
@@ -201,7 +201,7 @@ public class NodesController {
     public HashMap<Integer, Integer> getParentNodes(@RequestBody ArrayList<Integer> nodeIds) {
         HashMap<Integer, Integer> parents = service.getParentNodes(nodeIds);
         logger.info("Got Parents Nodes in a HashMap");
-        logger.debug(parents);
+        logger.debug(String.valueOf(parents));
         return parents;
     }
 
@@ -209,7 +209,7 @@ public class NodesController {
     public ArrayList<Node> getRootNodes(@PathVariable("resourceId") int resourceId) {
         ArrayList<Node> roots = service.getRoots(resourceId);
         logger.info("Got Root Nodes of Resource: " + resourceId);
-        logger.debug(roots);
+        logger.debug(String.valueOf(roots));
         return roots;
     }
 
@@ -217,7 +217,7 @@ public class NodesController {
     public List<Node> getNodesWithPlaceholder(@PathVariable("resourceId") int resourceId) {
         List<Node> nodes = service.getNodesWithPlaceholder(resourceId);
         logger.info("Got Nodes with Placeholder of Resource: " + resourceId);
-        logger.debug(nodes);
+        logger.debug(String.valueOf(nodes));
         return nodes;
     }
 
@@ -225,7 +225,7 @@ public class NodesController {
     public ArrayList<Node> getAncestors(@PathVariable("generatedNodeId") int generatedNodeId) {
         ArrayList<Node> ancestors = service.getAncestors(generatedNodeId);
         logger.info("Get Ancestors of Node: " + generatedNodeId);
-        logger.debug(ancestors);
+        logger.debug(String.valueOf(ancestors));
         return ancestors;
     }
 
@@ -233,7 +233,7 @@ public class NodesController {
     public ArrayList<Node> getchildren(@PathVariable("generatedNodeId") int generatedNodeId) {
         ArrayList<Node> children = service.getChildren(generatedNodeId);
         logger.info("Get Children of Node: " + generatedNodeId);
-        logger.debug(children);
+        logger.debug(String.valueOf(children));
         return children;
     }
 
@@ -264,7 +264,7 @@ public class NodesController {
         boolean flag = service.addPagestoNode(results);
         if (flag) {
             logger.info("Added Page IDs to Nodes Successfully");
-            logger.debug(results);
+            logger.debug(String.valueOf(results));
         } else
             logger.info("Failed to Add Page IDs to Nodes");
         return flag;
@@ -288,7 +288,7 @@ public class NodesController {
     public ArrayList<Node> getNativeVirusNode() {
         ArrayList<Node> nodeList = service.getNativeVirusNode();
         logger.info("Got Native Virus Nodes");
-        logger.debug(nodeList);
+        logger.debug(String.valueOf(nodeList));
         return nodeList;
     }
 
@@ -332,7 +332,7 @@ public class NodesController {
     public ArrayList<Node> getNodesByGeneratedIds(@RequestBody ArrayList<String> genetaredIds) {
         ArrayList<Node> nodeList = service.getNodesByAttribute(Constants.NODE_ATTRIBUTE_GENERATEDID, genetaredIds);
         logger.info("Called Get Nodes By Generated IDs");
-        logger.debug(nodeList);
+        logger.debug(String.valueOf(nodeList));
         return nodeList;
     }
 
@@ -340,7 +340,7 @@ public class NodesController {
     public ArrayList<Node> getSynonyms(@PathVariable("generatedNodeId") int generatedNodeId) {
         ArrayList<Node> synonyms = service.getSynonyms(generatedNodeId);
         logger.info("Get Synonyms of Node: " + generatedNodeId);
-        logger.debug(synonyms);
+        logger.debug(String.valueOf(synonyms));
         return synonyms;
     }
 
@@ -348,17 +348,17 @@ public class NodesController {
     public List<HashMap<Integer, Integer>> getNodeAncestors(@RequestBody List<Integer> generatedNodesIds) {
         List<HashMap<Integer, Integer>> ancestors = service.getNodeAncestors(generatedNodesIds);
         logger.info("Got Node Ancestors");
-        logger.debug(ancestors);
+        logger.debug(String.valueOf(ancestors));
         return ancestors;
     }
 
-    @RequestMapping(value="/getPageIds", method = RequestMethod.POST, produces = "application/json")
-    public List< Integer> getPageIds(@RequestBody List<Integer> generatedNodesIds) {
-        List<Integer> pageIds = service.getPageIds(generatedNodesIds);
-        logger.info("Got Page IDs");
-        logger.debug(pageIds);
-        return pageIds;
-    }
+//    @RequestMapping(value="/getPageIds", method = RequestMethod.POST, produces = "application/json")
+//    public List< Integer> getPageIds(@RequestBody List<Integer> generatedNodesIds) {
+//        List<Integer> pageIds = service.getPageIds(generatedNodesIds);
+//        logger.info("Got Page IDs");
+//        logger.debug(String.valueOf(pageIds));
+//        return pageIds;
+//    }
 
     @RequestMapping(value = "/updateAcceptedNode", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public int updateAcceptedNode(@RequestBody Node n) {

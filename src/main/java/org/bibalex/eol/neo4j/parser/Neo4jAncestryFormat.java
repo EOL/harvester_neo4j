@@ -1,8 +1,6 @@
 package org.bibalex.eol.neo4j.parser;
 
 import org.apache.commons.codec.binary.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.csv.reader.Mark;
@@ -10,13 +8,15 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.StatementResult;
 import org.neo4j.driver.Value;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jAncestryFormat extends Neo4jCommon {
-    private static final Logger logger = LogManager.getLogger(Neo4jAncestryFormat.class);
+    private static final Logger logger = LoggerFactory.getLogger(Neo4jAncestryFormat.class);
 
     public int createAncestorIfNotExist(int resourceId, String scientificName, String rank, String nodeId,
                                         int parentGeneratedNodeId, int pageId)

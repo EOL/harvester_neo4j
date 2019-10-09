@@ -4,8 +4,8 @@ import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.StatementResult;
 import org.neo4j.driver.Value;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
 
 public class TaxonMatching extends Neo4jCommon{
-    private static final Logger logger = LogManager.getLogger(TaxonMatching.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaxonMatching.class);
     public ArrayList<Node> getAncestorsNodes(int generatedNodeId)
     {
         ArrayList<Node> old_branch = new ArrayList<>();
