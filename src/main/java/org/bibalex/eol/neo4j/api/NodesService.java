@@ -255,6 +255,10 @@ public class NodesService {
         return parser.getNodeAncestors(generatedNodesIds);
     }
 
+    public List<HashMap<Integer,Integer>> getNodeAncestors(List<Integer> generatedNodesIds, int context) {
+        return parser.getNodeAncestors(generatedNodesIds, context);
+    }
+
     public List<Integer> getPageIds(List<Integer> generatedNodesIds) {
         return parser.getPageIds(generatedNodesIds);
     }

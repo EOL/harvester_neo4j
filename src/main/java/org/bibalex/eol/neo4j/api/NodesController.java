@@ -274,4 +274,19 @@ public class NodesController {
         int generatedNodeId = service.updateAcceptedNode(n);
         return generatedNodeId;
     }
+
+    @RequestMapping(value="/getMinimalContextAncestor", method = RequestMethod.POST, produces = "application/json")
+    public List<HashMap<Integer, Integer>> getMinimalContextNodeAncestor(@RequestBody List<Integer> generatedNodesIds) {
+        return service.getNodeAncestors(generatedNodesIds, 1);
+    }
+
+    @RequestMapping(value="/getAbbreviatedContextAncestors", method = RequestMethod.POST, produces = "application/json")
+    public List<HashMap<Integer, Integer>> getAbbreviatedContextAncestors(@RequestBody List<Integer> generatedNodesIds) {
+        return service.getNodeAncestors(generatedNodesIds, 2);
+    }
+
+    @RequestMapping(value="/getExtendedContextAncestors", method = RequestMethod.POST, produces = "application/json")
+    public List<HashMap<Integer, Integer>> getExtendedContextAncestors(@RequestBody List<Integer> generatedNodesIds) {
+        return service.getNodeAncestors(generatedNodesIds, 3);
+    }
 }
