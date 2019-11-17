@@ -623,14 +623,17 @@ public class Neo4jCommon {
             case 1:
                 //  Minimal Context: Get the closest ancestor with Landmark = 1
                 for (Integer gNodeId : generatedNodesIds) {
+                    int count = 0;
                     nodeList = new HashMap<>();
-                    String query = " MATCH len = (p:GNode {landmark: 1})-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
+                    String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
+                            " WHERE p.landmark = 1 OR LENGTH(len) = 0" +
                             " RETURN LENGTH(len) AS len, p.generated_auto_id AS id";
                     StatementResult result = getSession().run(query, parameters("generatedNodeId",
                             gNodeId));
-                    if (result.hasNext()) {
+                    while (result.hasNext() && count < 2) {
                         Record record = result.next();
                         nodeList.put(record.get("len").asInt(), record.get("id").asInt());
+                        count ++;
                     }
                     nodes.add(nodeList);
                 }
@@ -641,7 +644,7 @@ public class Neo4jCommon {
                 for (Integer gNodeId : generatedNodesIds) {
                     nodeList = new HashMap<>();
                     String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
-                            " WHERE p.landmark IN [1, 2] OR p.rank =~ \'(?i)family\'" +
+                            " WHERE p.landmark IN [1, 2] OR p.rank =~ \'(?i)family\' OR LENGTH(len) = 0" +
                             " RETURN LENGTH(len) AS len, p.generated_auto_id as id";
                     StatementResult result = getSession().run(query, parameters("generatedNodeId",
                             gNodeId));
@@ -658,7 +661,7 @@ public class Neo4jCommon {
                 for (Integer gNodeId : generatedNodesIds) {
                     nodeList = new HashMap<>();
                     String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
-                            " WHERE p.landmark IN [1, 2, 3] OR p.rank =~ \'(?i)family\'" +
+                            " WHERE p.landmark IN [1, 2, 3] OR p.rank =~ \'(?i)family\' OR LENGTH(len) = 0" +
                             " RETURN LENGTH(len) AS len, p.generated_auto_id as id";
                     StatementResult result = getSession().run(query, parameters("generatedNodeId",
                             gNodeId));
