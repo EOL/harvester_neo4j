@@ -3,12 +3,7 @@ package org.bibalex.eol.neo4j.parser;
 import apoc.util.ArrayBackedList;
 import org.bibalex.eol.neo4j.models.Node;
 
-//import static org.neo4j.driver.Values.NULL;
-//import static org.neo4j.driver.Values.parameters;
-
-
 import org.neo4j.driver.*;
-import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -578,20 +573,27 @@ public class Neo4jCommon {
     }
 
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds) {
-        List<HashMap<Integer, Integer>> nodes = new ArrayList<HashMap<Integer, Integer>>();
-        for (Integer gNodeId : generatedNodesIds) {
-            String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}}) " +
-                    "return length(len) AS len, p.generated_auto_id as id";
-            HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
-            StatementResult result = getSession().run(query, parameters("generatedNodeId",
-                    gNodeId));
-            while (result.hasNext()) {
-                logger.debug("Node:" + gNodeId);
-                Record record = result.next();
-                nodeList.put(record.get("len").asInt(), record.get("id").asInt());
+        List<HashMap<Integer, Integer>> nodes = new ArrayList<>();
+//        for (Integer gNodeId : generatedNodesIds) {
+        String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode) " +
+                "WHERE n.generated_auto_id IN {generatedNodeIds} RETURN LENGTH(len) AS len, p.generated_auto_id AS id";
+        StatementResult result = getSession().run(query, parameters("generatedNodeIds", generatedNodesIds));
+        HashMap<Integer, Integer> nodeList = new HashMap<>();
+
+        while (result.hasNext()) {
+            Record record = result.next();
+
+            int length = record.get("len").asInt(),
+                    id = record.get("id").asInt();
+            if (length == 0 && !(nodeList.isEmpty())) {
+                nodes.add(nodeList);
+                nodeList = new HashMap<>();
             }
-            nodes.add(nodeList);
+            nodeList.put(length, id);
         }
+        nodes.add(nodeList);
+
+//        }
 //            String query = " MATCH len = (p)-[:IS_PARENT_OF*0..]->(n:Node) where n.generated_auto_id in [ " +
 //                    generatedNodesIds.stream().map(x -> x+"").collect(Collectors.joining(",")) +
 //                    "] return collect(length(len)) as l,collect(p.generated_auto_id) as nId, n.generated_auto_id as id";
@@ -618,61 +620,76 @@ public class Neo4jCommon {
     public List<HashMap<Integer, Integer>> getNodeAncestors(List<Integer> generatedNodesIds, int context) {
         List<HashMap<Integer, Integer>> nodes = new ArrayList<HashMap<Integer, Integer>>();
         HashMap<Integer, Integer> nodeList = new HashMap<Integer, Integer>();
+        String query = "";
+        StatementResult result;
 
         switch (context) {
             case 1:
                 //  Minimal Context: Get the closest ancestor with Landmark = 1
-                for (Integer gNodeId : generatedNodesIds) {
-                    int count = 0;
-                    nodeList = new HashMap<>();
-                    String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
-                            " WHERE p.landmark = 1 OR LENGTH(len) = 0" +
-                            " RETURN LENGTH(len) AS len, p.generated_auto_id AS id";
-                    StatementResult result = getSession().run(query, parameters("generatedNodeId",
-                            gNodeId));
-                    while (result.hasNext() && count < 2) {
-                        Record record = result.next();
-                        nodeList.put(record.get("len").asInt(), record.get("id").asInt());
-                        count ++;
-                    }
-                    nodes.add(nodeList);
-                }
+                query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode)" +
+                        " WHERE n.generated_auto_id IN {generatedNodeIds} AND (p.landmark = 1 OR LENGTH(len) = 0)" +
+                        " RETURN LENGTH(len) AS len, p.generated_auto_id AS id";
                 break;
 
             case 2:
                 //  Abbreviated Context: Get all ancestors with Landmark = 1 or 2, as well as the ancestor of rank "Family"- if exists
-                for (Integer gNodeId : generatedNodesIds) {
-                    nodeList = new HashMap<>();
-                    String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
-                            " WHERE p.landmark IN [1, 2] OR p.rank =~ \'(?i)family\' OR LENGTH(len) = 0" +
-                            " RETURN LENGTH(len) AS len, p.generated_auto_id as id";
-                    StatementResult result = getSession().run(query, parameters("generatedNodeId",
-                            gNodeId));
-                    while (result.hasNext()) {
-                        Record record = result.next();
-                        nodeList.put(record.get("len").asInt(), record.get("id").asInt());
-                    }
-                    nodes.add(nodeList);
-                }
+                query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode)" +
+                        " WHERE n.generated_auto_id IN {generatedNodeIds}" +
+                        " AND (p.landmark IN [1, 2] OR p.rank =~ \'(?i)family\' OR LENGTH(len) = 0)" +
+                        " RETURN LENGTH(len) AS len, p.generated_auto_id as id";
                 break;
 
             case 3:
                 //  Extended Context: Get all ancestors with Landmark = 1, 2 or 3, as well as the ancestor of rank "Family"- if exists
-                for (Integer gNodeId : generatedNodesIds) {
-                    nodeList = new HashMap<>();
-                    String query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode {generated_auto_id: {generatedNodeId}})" +
-                            " WHERE p.landmark IN [1, 2, 3] OR p.rank =~ \'(?i)family\' OR LENGTH(len) = 0" +
-                            " RETURN LENGTH(len) AS len, p.generated_auto_id as id";
-                    StatementResult result = getSession().run(query, parameters("generatedNodeId",
-                            gNodeId));
-                    while (result.hasNext()) {
-                        Record record = result.next();
-                        nodeList.put(record.get("len").asInt(), record.get("id").asInt());
-                    }
-                    nodes.add(nodeList);
-                }
+
+                query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode)" +
+                        " WHERE n.generated_auto_id IN {generatedNodeIds}" +
+                        " AND (p.landmark IN [1, 2, 3] OR p.rank =~ \'(?i)family\' OR LENGTH(len) = 0)" +
+                        " RETURN LENGTH(len) AS len, p.generated_auto_id as id";
+
+                break;
+
+            case 4:
+                // Full Context: Get all ancestors
+                query = " MATCH len = (p:GNode)-[:IS_PARENT_OF*0..]->(n:GNode)" +
+                        " WHERE n.generated_auto_id IN {generatedNodeIds} RETURN LENGTH(len) AS len, p.generated_auto_id AS id";
                 break;
         }
+
+        if (context == 1) {
+            int count = 0;
+            result = getSession().run(query, parameters("generatedNodeIds", generatedNodesIds));
+            while (result.hasNext()) {
+                Record record = result.next();
+                int length = record.get("len").asInt(),
+                        id = record.get("id").asInt();
+                if (length == 0 && !(nodeList.isEmpty())) {
+                    nodes.add(nodeList);
+                    nodeList = new HashMap<>();
+                    count = 0;
+                }
+                if (count < 2)
+                    nodeList.put(length, id);
+                count++;
+            }
+        } else {
+            nodeList = new HashMap<>();
+            result = getSession().run(query, parameters("generatedNodeIds", generatedNodesIds));
+            while (result.hasNext()) {
+                Record record = result.next();
+
+                int length = record.get("len").asInt(),
+                        id = record.get("id").asInt();
+                if (length == 0 && !(nodeList.isEmpty())) {
+                    nodes.add(nodeList);
+                    nodeList = new HashMap<>();
+                }
+                nodeList.put(length, id);
+            }
+            nodes.add(nodeList);
+        }
+
+        nodes.add(nodeList);
         return nodes;
     }
 

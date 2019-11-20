@@ -260,7 +260,7 @@ public class NodesController {
 
     @RequestMapping(value="/getAncestors", method = RequestMethod.POST, produces = "application/json")
     public List<HashMap<Integer, Integer>> getNodeAncestors(@RequestBody List<Integer> generatedNodesIds) {
-        return service.getNodeAncestors(generatedNodesIds);
+        return service.getNodeAncestors(generatedNodesIds, 4);
     }
 
     @RequestMapping(value="/getPageIds", method = RequestMethod.POST, produces = "application/json")
