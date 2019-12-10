@@ -1,5 +1,6 @@
 package org.bibalex.eol.neo4j.indexer;
 
+import org.bibalex.eol.neo4j.parser.Constants;
 import org.globalnames.parser.ScientificNameParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,15 +43,13 @@ public class GlobalNamesHandler {
 
     }
 
-
     public boolean isHybrid(String name){
-        logger.info("Getting isHyprid of node with scientific name" +name );
-        return parseAndGetResult(name, "hybrid");
+        logger.info("Getting isHyprid of node with scientific name" + name );
+        return parseAndGetResult(name, Constants.HYBRID);
     }
 
-
     public String getCanonicalName(String name )  {
-        logger.info("Getting canonical node with scientific name" +name );
-        return parseAndGetResultString(name, "canonical_name");
+        logger.info("Getting canonical node with scientific name" + name );
+        return parseAndGetResultString(name, Constants.NODE_ATTRIBUTE_CANONICAL_NAME);
     }
 }

@@ -4,14 +4,14 @@ import org.apache.commons.codec.binary.StringUtils;
 import org.bibalex.eol.neo4j.hbase.HbaseData;
 import org.bibalex.eol.neo4j.models.Node;
 import org.neo4j.csv.reader.Mark;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.StatementResult;
-import org.neo4j.driver.Value;
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import org.neo4j.graphdb.Transaction;
 
 import java.util.*;
 
-import static org.neo4j.driver.Values.parameters;
+import static org.neo4j.driver.v1.Values.parameters;
 
 public class Neo4jAncestryFormat extends Neo4jCommon {
 
@@ -20,8 +20,7 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
     {
 
         int nodeGeneratedNodeId = getAncestoryFormatNodeIfExist(resourceId, scientificName, parentGeneratedNodeId);
-        if (nodeGeneratedNodeId == -1)
-        {
+        if (nodeGeneratedNodeId == -1) {
             logger.debug("Node "+ scientificName +" not found creating a new node");
 //            autoId = getAutoId();
             String hasPage = (pageId > 0)? (":" + Constants.HAS_PAGE_LABEL) : "";
@@ -52,23 +51,16 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
                     create_query = "MATCH (n {generated_auto_id: {autoId}}) SET n:Root RETURN n.generated_auto_id";
                     result = getSession().run(create_query, parameters("autoId", genId));
                 }
-
                 logger.debug("Node  " + scientificName + " created ");
                 return genId;
             } else {
                 logger.debug("Node  " + scientificName + " is not created a problem has occurred");
                 return -1;
             }
-
-        }
-
-        else
-        {
-            logger.debug("Node "+ scientificName +"  found");
+        } else {
+            logger.debug("Node " + scientificName + "  found");
             return nodeGeneratedNodeId;
-
         }
-
     }
 
     public ArrayList<Node> getNodesWithPlaceholder(int resourceId)
@@ -89,7 +81,6 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
             node.setResourceId(resourceId);
             int page = data.get("page_id").isNull() ? -1 : data.get("page_id").asInt();
             node.setPageId(page);
-
             nodes.add(node);
         }
        return nodes;
@@ -97,94 +88,76 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
 
     public int getAncestoryFormatNodeIfExist(int resourceId, String scientificName, int parentGeneratedNodeId )
     {
-
         String query = "MATCH (n {resource_id: {resourceId} , scientific_name: {scientificName}})<-[r:IS_PARENT_OF]-(p {generated_auto_id: {parentGeneratedNodeId}}) RETURN n.generated_auto_id UNION" +
                 " MATCH (n:Root {resource_id: {resourceId} , scientific_name: {scientificName}}) RETURN n.generated_auto_id";
         StatementResult result = getSession().run(query, parameters( "resourceId",resourceId,
                 "scientificName", scientificName, "parentGeneratedNodeId", parentGeneratedNodeId));
 
-        if (result.hasNext())
-        {
+        if (result.hasNext()) {
             Record record = result.next();
             logger.debug("The result of search" +record.get("n.generated_auto_id").asInt() );
             return record.get("n.generated_auto_id").asInt();
-        }
-
-        else
-        {
+        } else {
             logger.debug("The result is -1");
             return -1;
         }
-
     }
-
 
     public int deleteNodeAncestoryFormat(String nodeId, int resourceId, String scientificName)
     {
         logger.debug("Deleting Node with nodeId " + nodeId + " of resource " + resourceId );
         int nodeGeneratedId = getAcceptedNodeIfExist(nodeId, scientificName, resourceId );
-        if (nodeGeneratedId != -1)
-        {
-            if (hasChildren(nodeGeneratedId))
-            {
+        if (nodeGeneratedId != -1) {
+            if (hasChildren(nodeGeneratedId)) {
                 logger.debug("Node has children so just delete");
                 MarkNodePlaceHolder(nodeGeneratedId);
-            }
-            else
-            {
+            } else {
                 CommonDeleteMethod(nodeGeneratedId);
-
             }
             if(checkIfNodeExists(nodeGeneratedId))
                 return -1;
             else
                 return nodeGeneratedId;
 
-        }
-        else
+        } else
             return -1;
-
     }
-
 
     public boolean UpdateNodeAncestoryFormat(ArrayList<Node> nodes)
     {
-            Node new_node = new Node();
-            new_node = nodes.get(nodes.size()-1);
-            int nodegeneratedId = getNodeIfExist(new_node.getNodeId(), new_node.getResourceId());
-            new_node.setGeneratedNodeId(nodegeneratedId);
-            boolean update_scientific_name = false;
-            boolean update_rank = false;
-            if (nodegeneratedId != -1)
-            {
-                Node old_node = getNodeProperties(nodegeneratedId);
+        Node new_node = new Node();
+        new_node = nodes.get(nodes.size()-1);
+        int nodegeneratedId = getNodeIfExist(new_node.getNodeId(), new_node.getResourceId());
+        new_node.setGeneratedNodeId(nodegeneratedId);
+        boolean update_scientific_name = false;
+        boolean update_rank = false;
+        if (nodegeneratedId != -1)
+        {
+            Node old_node = getNodeProperties(nodegeneratedId);
 
-                if (!old_node.getScientificName().equals(new_node.getScientificName())) {
+            if (!old_node.getScientificName().equals(new_node.getScientificName())) {
 
-                    logger.debug("Update scientific Name of the node");
-                    update_scientific_name = UpdateScientificName(nodegeneratedId, new_node.getScientificName());
+                logger.debug("Update scientific Name of the node");
+                update_scientific_name = UpdateScientificName(nodegeneratedId, new_node.getScientificName());
 
-                }
-                if (!old_node.getRank().equals(new_node.getRank()) )
-                {
-
-                    logger.debug("Update rank of the node ");
-                    update_rank = UpdateRank(nodegeneratedId, new_node.getRank());
-
-                }
-                if (update_scientific_name || update_rank) {
-                    return true;
-                }
-                else {
-                    logger.debug("Update ancestry in ancestory format");
-                    return UpdateHierarchy(nodes);
-                }
             }
+            if (!old_node.getRank().equals(new_node.getRank()) )
+            {
 
-            logger.debug("Update failed");
-            return false;
+                logger.debug("Update rank of the node ");
+                update_rank = UpdateRank(nodegeneratedId, new_node.getRank());
 
-
+            }
+            if (update_scientific_name || update_rank) {
+                return true;
+            }
+            else {
+                logger.debug("Update ancestry in ancestory format");
+                return UpdateHierarchy(nodes);
+            }
+        }
+        logger.debug("Update failed");
+        return false;
     }
 
     public boolean UpdateHierarchy(ArrayList<Node> nodes)
@@ -193,13 +166,10 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         ArrayList<Object> old_branch  = new ArrayList<>();
         old_branch =  getOldBranchOfNode(nodes.get(nodes.size()-1));
         int updated_node_index = getIndexOfUpdatedNode(nodes);
-        if (updated_node_index >= nodes.size())
-        {
+        if (updated_node_index >= nodes.size()) {
             logger.debug("There is no update Ancestry too");
             return false;
-        }
-        else
-        {
+        } else {
             Node updated_node = new Node();
             Node parent_node  =  new Node();
             updated_node = nodes.get(updated_node_index);
@@ -224,19 +194,14 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
 
             int new_node_generated_id = getAncestoryFormatNodeIfExist(updated_node.getResourceId(), updated_node.getScientificName(),
                     parent_node.getGeneratedNodeId());
-            if (new_node_generated_id != old_node_generated_id)
-            {
+            if (new_node_generated_id != old_node_generated_id) {
                 logger.debug("New node created due to update ancestory");
                 return true;
-            }
-            else
-            {
+            } else {
                 logger.debug("Update stopped some problem occurred");
                 return false;
             }
-
         }
-
     }
 
     public ArrayList<Object> getOldBranchOfNode(Node node)
@@ -245,7 +210,6 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         node.setGeneratedNodeId(getNodeIfExist(node.getNodeId(), node.getResourceId()));
         old_branch = getAncestors(node.getGeneratedNodeId());
         return old_branch;
-
     }
 
     public ArrayList<Object> getAncestors(int generatedNodeId)
@@ -263,15 +227,13 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         return old_branch;
     }
 
-
     public int getIndexOfUpdatedNode(ArrayList <Node> nodes)
     {
         int nodegeneratedId;
         Node node = new Node();
         node = nodes.get(0);
         nodegeneratedId = getAncestoryFormatNodeIfExist(node.getResourceId(), node.getScientificName(), 0);
-        if (nodegeneratedId != -1)
-        {
+        if (nodegeneratedId != -1) {
             int i;
             for (i = 1; i < nodes.size(); i++)
             {
@@ -279,24 +241,15 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
                 node = nodes.get(i);
                 nodegeneratedId = getAncestoryFormatNodeIfExist(node.getResourceId(), node.getScientificName(), nodegeneratedId);
                 node.setGeneratedNodeId(nodegeneratedId);
-                if (nodegeneratedId == -1)
-                {
+                if (nodegeneratedId == -1) {
                     logger.debug("Update found starting from node with Scientific Name " + node.getScientificName());
                     break;
                 }
-
             }
             return i;
-
-        }
-        else
-        {
+        } else {
             logger.debug("The update is in Kingdom");
             return 0;
         }
-
     }
-
-
-
 }

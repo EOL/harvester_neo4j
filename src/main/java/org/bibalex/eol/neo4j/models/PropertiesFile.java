@@ -3,11 +3,6 @@ package org.bibalex.eol.neo4j.models;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-
-/**
- * Created by maha.mostafa on 6/2/2018.
- */
-
 @Component
 @ConfigurationProperties
 public class PropertiesFile {

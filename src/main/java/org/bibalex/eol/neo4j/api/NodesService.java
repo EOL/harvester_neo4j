@@ -8,7 +8,7 @@ import org.bibalex.eol.neo4j.models.PropertiesFile;
 import org.bibalex.eol.neo4j.parser.*;
 import org.bibalex.eol.neo4j.models.Node;
 import org.json.simple.JSONObject;
-import org.neo4j.driver.Session;
+import org.neo4j.driver.v1.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,6 @@ public class NodesService {
     Logger logger = LoggerFactory.getLogger(Neo4jCommon.class);
     private PropertiesFile app;
 
-
     @Autowired
     public void setApp(PropertiesFile app) {
         this.app = app;
@@ -45,25 +44,21 @@ public class NodesService {
 //        parser.createInitNode();
     }
 
-    public int createNode(Node n)
-    {
-        int generatedNodeId =  parser.createAcceptedNodeUpdated(n.getResourceId(), n.getNodeId(),n.getScientificName(), n.getRank(),
+    public int createNode(Node n) {
+        int generatedNodeId =  parser.createAcceptedNodeUpdated(n.getResourceId(), n.getNodeId(), n.getScientificName(), n.getRank(),
                 n.getParentGeneratedNodeId(), n.getPageId());
         n.setGeneratedNodeId(generatedNodeId);
         return n.getGeneratedNodeId();
     }
 
-    public int createSynonym(Node n)
-    {
+    public int createSynonym(Node n) {
         int generatedNodeId =  parser.createSynonymNode(n.getResourceId(), n.getNodeId(), n.getScientificName(),
                 n.getRank(), n.getAcceptedNodeId(), n.getAcceptedNodeGeneratedId());
         n.setGeneratedNodeId(generatedNodeId);
         return n.getGeneratedNodeId();
     }
 
-
-    public int createParentNode(Node n)
-    {
+    public int createParentNode(Node n) {
         if(n.getParentNodeId() != null) {
             int generatedNodeId = pNode.createParentWithPlaceholder(n.getResourceId(), n.getParentNodeId());
             n.setGeneratedNodeId(generatedNodeId);
@@ -74,78 +69,66 @@ public class NodesService {
         }
     }
 
-    public int createAncestorNode(Node n)
-    {
+    public int createAncestorNode(Node n) {
         int generatedNodeId =  aNode.createAncestorIfNotExist(n.getResourceId(), n.getScientificName(),
                 n.getRank(), n.getNodeId(), n.getParentGeneratedNodeId(), n.getPageId());
         n.setGeneratedNodeId(generatedNodeId);
         return n.getGeneratedNodeId();
     }
 
-    public int createNodewithFulldata(Node n)
-    {
+    public int createNodewithFulldata(Node n) {
         int generatedNodeId = parser.createNodewithFulldata(n.getResourceId(), n.getNodeId(), n.getScientificName(),
                 n.getRank(), n.getParentGeneratedNodeId(), n.getPageId());
         return generatedNodeId;
     }
 
-    public int deleteNodeAncestoryFormat(Node n)
-    {
+    public int deleteNodeAncestoryFormat(Node n) {
         int node_deleted_id  = aNode.deleteNodeAncestoryFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
         return node_deleted_id;
     }
 
-    public int deleteNodeParentFormat(Node n)
-    {
+    public int deleteNodeParentFormat(Node n) {
         int node_deleted_id  = pNode.deleteNodeParentFormat(n.getNodeId(), n.getResourceId(), n.getScientificName());
         return node_deleted_id;
     }
 
-    public int updateNodeParentFormat(Node new_node, String parent)
-    {
+    public int updateNodeParentFormat(Node new_node, String parent) {
         int result =  pNode.UpdateNodeParentFormat(new_node, parent);
         return result;
     }
 
-    public boolean updateNodeAncestoryFormat(ArrayList<Node> nodes)
-    {
+    public boolean updateNodeAncestoryFormat(ArrayList<Node> nodes) {
         boolean result = aNode.UpdateNodeAncestoryFormat(nodes);
         return result;
     }
 
-    public boolean createRelationBetweenNodeAndSynonyms(Node n)
-    {
+    public boolean createRelationBetweenNodeAndSynonyms(Node n) {
         boolean created = parser.createRelationBetweenNodeAndSynonyms(n.getAcceptedNodeGeneratedId(), n.getGeneratedNodeId());
         return created;
     }
 
-    public int getNode(Node n)
-    {
-        int generatedNodeId = parser.getNodeIfExist(n.getNodeId(),n.getResourceId());
+    public int getNode(Node n) {
+        int generatedNodeId = parser.getNodeIfExist(n.getNodeId(), n.getResourceId());
         return generatedNodeId;
     }
 
 
-    public int getAcceptedNode(Node n)
-    {
-        int generatedNodeId = parser.getAcceptedNodeIfExist(n.getNodeId(),n.getScientificName(),n.getResourceId());
+    public int getAcceptedNode(Node n) {
+        int generatedNodeId = parser.getAcceptedNodeIfExist(n.getNodeId(), n.getScientificName(), n.getResourceId());
         return generatedNodeId;
     }
 
-    public int getSynonymNode(Node n)
-    {
+    public int getSynonymNode(Node n) {
         int generatedNodeId = parser.getSynonymNodeIfExist(n.getNodeId(), n.getScientificName(),
                 n.getResourceId(), n.getAcceptedNodeId(), n.getAcceptedNodeGeneratedId());
         return generatedNodeId;
     }
 
-
-    public NodeData getData(String generatedNodeId)
-    {
+    public NodeData getData(String generatedNodeId) {
         ArrayList<String> ancestors = hbaseData.getAncestors(Integer.parseInt(generatedNodeId));
         ArrayList<String> children = hbaseData.getChildren(Integer.parseInt(generatedNodeId));
         ArrayList<String> synonyms = hbaseData.getSynonyms(Integer.parseInt(generatedNodeId));
-        nodeData.setData(ancestors,children,synonyms);
+        nodeData.setData(ancestors, children, synonyms);
         return nodeData;
     }
 
@@ -161,55 +144,47 @@ public class NodesService {
 
     }
 
-    public ArrayList<Neo4jTree> getResourceTrees(int resourceId)
-    {
+    public ArrayList<Neo4jTree> getResourceTrees(int resourceId) {
         ArrayList<Neo4jTree> trees=forest.getTrees(resourceId);
         return trees;
     }
 
-    public HashMap<Integer,Integer> getParentNodes(ArrayList<Integer> nodeIds)
-    {
+    public HashMap<Integer,Integer> getParentNodes(ArrayList<Integer> nodeIds) {
         HashMap<Integer,Integer> ParentNodes = new HashMap<>();
         nodeIds.forEach((nodeId) -> {
             int parentGeneratedNodeId;
             parentGeneratedNodeId = parser.getParent((int)nodeId);
-            ParentNodes.put(nodeId,parentGeneratedNodeId);
+            ParentNodes.put(nodeId, parentGeneratedNodeId);
         });
         return ParentNodes;
     }
 
-    public ArrayList<Node> getRoots(int resourceId)
-    {
+    public ArrayList<Node> getRoots(int resourceId) {
         ArrayList<Node> roots = TaxonM.getRootNodes(resourceId);
         return roots;
     }
 
-    public ArrayList<Node> getAncestors(int generatedNodeId)
-    {
+    public ArrayList<Node> getAncestors(int generatedNodeId) {
         ArrayList<Node> ancestors = TaxonM.getAncestorsNodes(generatedNodeId);
         return ancestors;
     }
 
-    public ArrayList<Node> getChildren(int generatedNodeId)
-    {
+    public ArrayList<Node> getChildren(int generatedNodeId) {
         ArrayList<Node> children = TaxonM.getChildrenNode(generatedNodeId);
         return children;
     }
 
-    public ArrayList<Node> getNodesWithPlaceholder(int resourceId)
-    {
+    public ArrayList<Node> getNodesWithPlaceholder(int resourceId) {
         ArrayList<Node> nodes = aNode.getNodesWithPlaceholder(resourceId);
         return nodes;
     }
 
-    public boolean hasChildren(int generatedNodeId)
-    {
+    public boolean hasChildren(int generatedNodeId) {
         boolean children = parser.hasChildren(generatedNodeId);
         return children;
     }
 
-    public boolean addPageIdtoNode(int generatedNodeId , int pageId)
-    {
+    public boolean addPageIdtoNode(int generatedNodeId , int pageId) {
         if(TaxonM.addPageIdtoNode(generatedNodeId, pageId) > -1)
             return true;
         else
@@ -238,8 +213,7 @@ public class NodesService {
         return parser.getLabeledNodesByAttribute(attribute, "", ids);
     }
 
-    public ArrayList<Node> getSynonyms(int generatedNodeId)
-    {
+    public ArrayList<Node> getSynonyms(int generatedNodeId) {
         ArrayList<Node> synonyms = TaxonM.getSynonyms(generatedNodeId);
         return synonyms;
     }
@@ -259,8 +233,7 @@ public class NodesService {
         return parser.getPageIds(generatedNodesIds);
     }
 
-    public int updateAcceptedNode(Node n)
-    {
+    public int updateAcceptedNode(Node n) {
         int generatedNodeId =  parser.updateAcceptedNode(n.getResourceId(), n.getNodeId(),
                 n.getParentGeneratedNodeId(), n.getScientificName());
         return generatedNodeId;
@@ -275,8 +248,6 @@ public class NodesService {
                 return -1;
             }
         }
-//        else if(type.equalsIgnoreCase("2"))
-//            return parser.harvestAncestoryFormatResource(resourceId, app.getResourcesDirectory());
         else
             return 3;
     }

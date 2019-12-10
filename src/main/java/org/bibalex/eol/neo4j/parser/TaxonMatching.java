@@ -1,17 +1,17 @@
 package org.bibalex.eol.neo4j.parser;
 
 import org.bibalex.eol.neo4j.models.Node;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.StatementResult;
-import org.neo4j.driver.Value;
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.neo4j.driver.Values.NULL;
-import static org.neo4j.driver.Values.parameters;
+import static org.neo4j.driver.v1.Values.NULL;
+import static org.neo4j.driver.v1.Values.parameters;
 
 public class TaxonMatching extends Neo4jCommon{
     public ArrayList<Node> getAncestorsNodes(int generatedNodeId)
@@ -89,14 +89,11 @@ public class TaxonMatching extends Neo4jCommon{
             StatementResult result = getSession().run(query, parameters("generatedNodeId", generatedNodeId));
             if(result.hasNext()) {
                 Record record = result.next();
-                if(record.get("n.page_id")!= NULL)
+                if(record.get("n.page_id") != NULL)
                     page_Id = record.get("n.page_id").asInt();
-
              }
         return page_Id;
-        }
-
-        else {
+        } else {
             logger.debug("Found Match and adding pageId");
             String query = "MATCH (n:GNode {generated_auto_id: {generatedNodeId}}) SET n:" + Constants.HAS_PAGE_LABEL + ", n.page_id = {pageId}" +
                     " RETURN n.page_id";
@@ -105,9 +102,7 @@ public class TaxonMatching extends Neo4jCommon{
                 Record record = result.next();
                 if(record.get("n.page_id")!= NULL)
                     page_Id = record.get("n.page_id").asInt();
-
             }
-
         }
          return page_Id;
     }
@@ -124,9 +119,7 @@ public class TaxonMatching extends Neo4jCommon{
                     logger.debug(" The pageId " +record.get("n.page_id"));
                     if (record.get("n.page_id") == NULL)
                         return  false;
-
                 }
-
         }
         return true;
     }
@@ -148,20 +141,35 @@ public class TaxonMatching extends Neo4jCommon{
     }
 
     public Node setNode(Value node_data)
-    {   Node node=new Node();
-        if( node_data.get("generated_auto_id")!= NULL ){node.setGeneratedNodeId(node_data.get("generated_auto_id").asInt());}
-        if(node_data.get("node_id")!= NULL){node.setNodeId(node_data.get("node_id").asString());}
-        if(node_data.get("resource_id")!= NULL){node.setResourceId(node_data.get("resource_id").asInt());}
-        if(node_data.get("rank")!= NULL){node.setRank(node_data.get("rank").asString());}
-        if(node_data.get("scientific_name")!= NULL){node.setScientificName(node_data.get("scientific_name").asString());}
-        if(node_data.get("page_id")!= NULL){node.setPageId(node_data.get("page_id").asInt());}
-        if(node_data.get("accepted_node_generated_id")!= NULL){node.setAcceptedNodeGeneratedId(node_data.get("accepted_node_generated_id").asInt());}
-        if(node_data.get("accepted_node_id")!= NULL){node.setAcceptedNodeId(node_data.get("accepted_node_id").asString());}
-        if(node_data.get("parent_node_generated_id")!= NULL){node.setParentGeneratedNodeId(node_data.get("parent_node_generated_id").asInt());}
-        if(node_data.get("parent_node_id")!= NULL){node.setParentNodeId(node_data.get("parent_node_id").asString());}
-        if(node_data.get("updated_at")!= NULL){node.setUpdated_at(node_data.get("updated_at").asLong());}
-        if(node_data.get("created_at")!= NULL){node.setCreated_at(node_data.get("created_at").asLong());}
-        if(node_data.get("canonical_name")!= NULL){node.setCanonicalName(node_data.get("canonical_name").asString());}
+    {
+        Node node=new Node();
+
+        if(node_data.get(Constants.NODE_ATTRIBUTE_GENERATEDID) != NULL ){
+            node.setGeneratedNodeId(node_data.get(Constants.NODE_ATTRIBUTE_GENERATEDID).asInt());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_NODEID) != NULL){
+            node.setNodeId(node_data.get(Constants.NODE_ATTRIBUTE_NODEID).asString());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_RESOURCEID) != NULL){
+            node.setResourceId(node_data.get(Constants.NODE_ATTRIBUTE_RESOURCEID).asInt());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_RANK)!= NULL){
+            node.setRank(node_data.get(Constants.NODE_ATTRIBUTE_RANK).asString());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_SCIENTIFICNAME) != NULL){
+            node.setScientificName(node_data.get(Constants.NODE_ATTRIBUTE_SCIENTIFICNAME).asString());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_PAGEID) != NULL){
+            node.setPageId(node_data.get(Constants.NODE_ATTRIBUTE_PAGEID).asInt());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_ACCEPTED_NODE_GENERATED_ID) != NULL){
+            node.setAcceptedNodeGeneratedId(node_data.get(Constants.NODE_ATTRIBUTE_ACCEPTED_NODE_GENERATED_ID).asInt());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_ACCEPTED_NODEID) != NULL){
+            node.setAcceptedNodeId(node_data.get(Constants.NODE_ATTRIBUTE_ACCEPTED_NODEID).asString());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_PARENT_NODE_GENERATED_ID) != NULL){
+            node.setParentGeneratedNodeId(node_data.get(Constants.NODE_ATTRIBUTE_PARENT_NODE_GENERATED_ID).asInt());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_PARENT_NODEID) != NULL){
+            node.setParentNodeId(node_data.get(Constants.NODE_ATTRIBUTE_PARENT_NODEID).asString());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_UPDATED_AT) != NULL){
+            node.setUpdated_at(node_data.get(Constants.NODE_ATTRIBUTE_UPDATED_AT).asLong());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_CREATED_AT) != NULL){
+            node.setCreated_at(node_data.get(Constants.NODE_ATTRIBUTE_CREATED_AT).asLong());}
+        if(node_data.get(Constants.NODE_ATTRIBUTE_CANONICAL_NAME) != NULL){
+            node.setCanonicalName(node_data.get(Constants.NODE_ATTRIBUTE_CANONICAL_NAME).asString());}
 
         return node;
     }

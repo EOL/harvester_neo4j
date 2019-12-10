@@ -9,19 +9,15 @@ public class JsonFileWriter {
     java.util.logging.Logger logger =  Logger.getLogger("json object creation");
     JSONObject obj;
     JSONObject node;
-    //    JSONObject nodes = new JSONObject();
     ArrayList<JSONObject> nodes = new ArrayList<JSONObject>();
-//    FileWriter file = new FileWriter("/home/ba/work/files/result.json");
 
     public JsonFileWriter()  {
 
     }
 
-
     public void renew ()
     {   logger.info("create new object and new node");
         obj  = new JSONObject();
-//        node = new JSONObject();
     }
 
     public void JsonAddString (String key ,String value)
@@ -46,12 +42,9 @@ public class JsonFileWriter {
 
     public void JsonAddNode(int generatedNodeId)
     {
-
         obj.put("generatedNodeId", generatedNodeId);
         logger.info("add node to array of nodes");
-//        node.put("node", obj);
         nodes.add(obj);
-
     }
 
     public ArrayList<JSONObject> getNodes()

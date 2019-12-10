@@ -1,16 +1,13 @@
 package org.bibalex.eol.neo4j.backend_api;
 
 import org.bibalex.eol.neo4j.models.Node;
-
 import org.bibalex.eol.neo4j.parser.Neo4jCommon;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.StatementResult;
-import org.neo4j.driver.Value;
-
+import org.neo4j.driver.v1.Record;
+import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.Value;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
-import static org.neo4j.driver.Values.parameters;
+import static org.neo4j.driver.v1.Values.parameters;
 
 public class Neo4jTree extends Neo4jCommon{
     Node root = new Node();
@@ -31,9 +28,7 @@ public class Neo4jTree extends Neo4jCommon{
             root.setResourceId(root_data.get("resource_id").asInt());
             root.setRank(root_data.get("rank").asString());
             root.setScientificName(root_data.get("scientific_name").asString());
-
         }
-
     }
 
     public Node getRoot()
@@ -48,10 +43,9 @@ public class Neo4jTree extends Neo4jCommon{
         StatementResult result = getSession().run(query, parameters("generatedNodeId",RootGeneratedNodeId));
         while (result.hasNext())
        {
-
-            Record record = result.next();
-            Node child = new Node();
-            Value  child_data = record.get("c");
+           Record record = result.next();
+           Node child = new Node();
+           Value  child_data = record.get("c");
            child.setGeneratedNodeId(child_data.get("generated_auto_id").asInt());
            child.setNodeId(child_data.get("node_id").toString());
            child.setResourceId(child_data.get("resource_id").asInt());
