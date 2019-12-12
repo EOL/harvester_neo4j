@@ -227,16 +227,14 @@ public class Neo4jAncestryFormat extends Neo4jCommon {
         return old_branch;
     }
 
-    public int getIndexOfUpdatedNode(ArrayList <Node> nodes)
-    {
+    public int getIndexOfUpdatedNode(ArrayList <Node> nodes) {
         int nodegeneratedId;
         Node node = new Node();
         node = nodes.get(0);
         nodegeneratedId = getAncestoryFormatNodeIfExist(node.getResourceId(), node.getScientificName(), 0);
         if (nodegeneratedId != -1) {
             int i;
-            for (i = 1; i < nodes.size(); i++)
-            {
+            for (i = 1; i < nodes.size(); i++) {
                 logger.debug("Search for the updated node in the branch");
                 node = nodes.get(i);
                 nodegeneratedId = getAncestoryFormatNodeIfExist(node.getResourceId(), node.getScientificName(), nodegeneratedId);
